@@ -1,0 +1,15 @@
+services:
+  querypilot:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"   # local only: the API has no authentication
+    environment:
+      # Ollama running on the host. Change for a remote Ollama endpoint.
+      OLLAMA_URL: http://host.docker.internal:11434/api/chat
+      QUERYPILOT_EVENT_LOG: /app/logs/query_events.jsonl
+      # Comma-separated models the API accepts (default: qwen2.5:7b only).
+      # QUERYPILOT_ALLOWED_MODELS: qwen2.5:7b,llama3.1:8b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # required on Linux
+    volumes:
+      - ./logs:/app/logs

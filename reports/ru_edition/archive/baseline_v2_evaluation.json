@@ -1,0 +1,1496 @@
+{
+  "model": "qwen2.5:7b",
+  "mode": "baseline",
+  "oracle_assisted": false,
+  "quality_repair_enabled": false,
+  "critic_observe_enabled": false,
+  "deterministic_repairs_enabled": false,
+  "max_correction_retries": 2,
+  "dataset": "golden",
+  "dataset_version": 2,
+  "dataset_language": "en",
+  "dataset_test_count": 30,
+  "dataset_sha256_prefix": "dc3599753cfa3ef8",
+  "prompt_sha256_prefix": "dfdb52e17d8a12fa",
+  "created_utc": "2026-11-02T05:23:23+00:00",
+  "summary": {
+    "deterministic_repair_attempts": 0,
+    "deterministic_repairs": 0,
+    "deterministic_repair_successes": 0,
+    "total": 30,
+    "stages": {
+      "first_attempt": {
+        "executed": 30,
+        "strict": 11,
+        "execution_match": 20,
+        "lenient": 21
+      },
+      "final": {
+        "executed": 30,
+        "strict": 11,
+        "execution_match": 20,
+        "lenient": 21
+      }
+    },
+    "critic": {
+      "valid": 0,
+      "invalid": 0,
+      "uncertain": 0,
+      "unavailable": 0,
+      "skipped": 0,
+      "total_reviews": 0,
+      "checked": 0,
+      "valid_rate": 0,
+      "invalid_rate": 0,
+      "uncertain_rate": 0
+    },
+    "by_category": {
+      "filtering": {
+        "total": 2,
+        "first_attempt_execution_match": 2,
+        "final_execution_match": 2
+      },
+      "aggregation": {
+        "total": 11,
+        "first_attempt_execution_match": 7,
+        "final_execution_match": 7
+      },
+      "joins": {
+        "total": 6,
+        "first_attempt_execution_match": 4,
+        "final_execution_match": 4
+      },
+      "subqueries": {
+        "total": 4,
+        "first_attempt_execution_match": 3,
+        "final_execution_match": 3
+      },
+      "sorting": {
+        "total": 3,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "multi_table_aggregation": {
+        "total": 2,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "date_filtering": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "date_aggregation": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      }
+    },
+    "average_attempts": 1.0,
+    "average_generation_attempts": 1.0,
+    "stuck_on_same_sql": 0,
+    "quality_valid_after_repair": null
+  },
+  "results": [
+    {
+      "test_id": "q01",
+      "question": "Which active products cost less than 500 UAH? Show the first 10.",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT product_id, name, price_cents\nFROM products\nWHERE is_active = 1 AND price_cents < 50000\nORDER BY price_cents ASC, product_id ASC\nLIMIT 10",
+      "final_sql": "SELECT product_id, name, price_cents\nFROM products\nWHERE is_active = 1 AND price_cents < 50000\nORDER BY price_cents ASC, product_id ASC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q02",
+      "question": "How many customers live in each city?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT city, COUNT(*) AS customer_count\nFROM customers\nGROUP BY city;",
+      "final_sql": "SELECT city, COUNT(*) AS customer_count\nFROM customers\nGROUP BY city;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q03",
+      "question": "How many customers have not placed any orders?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) AS customer_count\nFROM customers\nWHERE customer_id NOT IN (SELECT customer_id FROM orders);",
+      "final_sql": "SELECT COUNT(*) AS customer_count\nFROM customers\nWHERE customer_id NOT IN (SELECT customer_id FROM orders);",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q04",
+      "question": "How many products have never appeared in any order?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) AS product_count\nFROM products\nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "final_sql": "SELECT COUNT(*) AS product_count\nFROM products\nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_count"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q05",
+      "question": "Which products have not been sold in delivered orders?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT p.product_id, p.name\nFROM products p\nWHERE p.product_id NOT IN (\n    SELECT oi.product_id\n    FROM orders o\n    JOIN order_items oi ON oi.order_id = o.order_id\n    WHERE o.status = 'delivered'\n)",
+      "final_sql": "SELECT p.product_id, p.name\nFROM products p\nWHERE p.product_id NOT IN (\n    SELECT oi.product_id\n    FROM orders o\n    JOIN order_items oi ON oi.order_id = o.order_id\n    WHERE o.status = 'delivered'\n)",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 3
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 3
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q06",
+      "question": "Show the 10 most expensive products, with their names and prices.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    p.product_id, \n    p.name, \n    p.price_cents / 100 AS price_uah\nFROM \n    products p\nORDER BY \n    p.price_cents DESC\nLIMIT 10",
+      "final_sql": "SELECT \n    p.product_id, \n    p.name, \n    p.price_cents / 100 AS price_uah\nFROM \n    products p\nORDER BY \n    p.price_cents DESC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "price_uah"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "price_uah"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q07",
+      "question": "How many orders are there for each status?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status;",
+      "final_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q08",
+      "question": "What is the monthly revenue from delivered orders after discounts?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    strftime('%Y-%m', o.ordered_at) AS month,\n    SUM((oi.quantity * oi.unit_price_cents) - o.discount_cents) AS monthly_revenue_cents\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nWHERE \n    o.status = 'delivered'\nGROUP BY \n    month\nORDER BY \n    month ASC;",
+      "final_sql": "SELECT \n    strftime('%Y-%m', o.ordered_at) AS month,\n    SUM((oi.quantity * oi.unit_price_cents) - o.discount_cents) AS monthly_revenue_cents\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nWHERE \n    o.status = 'delivered'\nGROUP BY \n    month\nORDER BY \n    month ASC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "monthly_revenue_cents"
+        ],
+        "row_count": 21
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "monthly_revenue_cents"
+        ],
+        "row_count": 21
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q09",
+      "question": "Which categories have the highest gross value of products sold in delivered orders before discounts? Show all categories.",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT\n        o.order_id,\n        p.category_id,\n        SUM(oi.quantity * oi.unit_price_cents) AS gross_value\n    FROM\n        orders o\n    JOIN\n        order_items oi ON o.order_id = oi.order_id\n    JOIN\n        products p ON oi.product_id = p.product_id\n    WHERE\n        o.status = 'delivered'\n    GROUP BY\n        o.order_id, p.category_id\n)\nSELECT\n    c.category_id,\n    c.name,\n    SUM(do.gross_value) AS total_gross_value\nFROM\n    categories c\nLEFT JOIN\n    delivered_orders do ON c.category_id = do.category_id\nGROUP BY\n    c.category_id, c.name\nORDER BY\n    total_gross_value DESC;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT\n        o.order_id,\n        p.category_id,\n        SUM(oi.quantity * oi.unit_price_cents) AS gross_value\n    FROM\n        orders o\n    JOIN\n        order_items oi ON o.order_id = oi.order_id\n    JOIN\n        products p ON oi.product_id = p.product_id\n    WHERE\n        o.status = 'delivered'\n    GROUP BY\n        o.order_id, p.category_id\n)\nSELECT\n    c.category_id,\n    c.name,\n    SUM(do.gross_value) AS total_gross_value\nFROM\n    categories c\nLEFT JOIN\n    delivered_orders do ON c.category_id = do.category_id\nGROUP BY\n    c.category_id, c.name\nORDER BY\n    total_gross_value DESC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_id",
+          "name",
+          "total_gross_value"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_id",
+          "name",
+          "total_gross_value"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q10",
+      "question": "Show the 10 products with the highest average rating, considering only products with at least five reviews.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        p.product_id,\n        p.name,\n        AVG(r.rating) AS average_rating\n    FROM\n        products p\n    JOIN\n        reviews r ON p.product_id = r.product_id\n    GROUP BY\n        p.product_id, p.name\n    HAVING\n        COUNT(r.review_id) >= 5\n)\nSELECT\n    product_id,\n    name,\n    average_rating\nFROM\n    avg_ratings\nORDER BY\n    average_rating DESC, product_id ASC\nLIMIT\n    10;",
+      "final_sql": "WITH avg_ratings AS (\n    SELECT\n        p.product_id,\n        p.name,\n        AVG(r.rating) AS average_rating\n    FROM\n        products p\n    JOIN\n        reviews r ON p.product_id = r.product_id\n    GROUP BY\n        p.product_id, p.name\n    HAVING\n        COUNT(r.review_id) >= 5\n)\nSELECT\n    product_id,\n    name,\n    average_rating\nFROM\n    avg_ratings\nORDER BY\n    average_rating DESC, product_id ASC\nLIMIT\n    10;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "average_rating"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "average_rating"
+        ],
+        "row_count": 6
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q11",
+      "question": "Which customers have placed more than three orders? Show the first 10, ordered by order count.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH order_counts AS (\n    SELECT \n        customer_id, \n        COUNT(*) AS order_count\n    FROM \n        orders\n    GROUP BY \n        customer_id\n)\nSELECT \n    c.customer_id, \n    c.full_name, \n    oc.order_count\nFROM \n    customers c\nJOIN \n    order_counts oc ON c.customer_id = oc.customer_id\nWHERE \n    oc.order_count > 3\nORDER BY \n    oc.order_count DESC, \n    c.customer_id ASC\nLIMIT \n    10;",
+      "final_sql": "WITH order_counts AS (\n    SELECT \n        customer_id, \n        COUNT(*) AS order_count\n    FROM \n        orders\n    GROUP BY \n        customer_id\n)\nSELECT \n    c.customer_id, \n    c.full_name, \n    oc.order_count\nFROM \n    customers c\nJOIN \n    order_counts oc ON c.customer_id = oc.customer_id\nWHERE \n    oc.order_count > 3\nORDER BY \n    oc.order_count DESC, \n    c.customer_id ASC\nLIMIT \n    10;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q12",
+      "question": "Show the 10 most expensive orders after discounts are applied.",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS total_cost_cents\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_cents DESC\nLIMIT 10",
+      "final_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS total_cost_cents\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_cents DESC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "ordered_at",
+          "total_cost_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "ordered_at",
+          "total_cost_cents"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q13",
+      "question": "How many orders used each coupon? Also show coupons that were never used.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "WITH used_coupons AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n),\nunused_coupons AS (\n    SELECT\n        coupon_id\n    FROM\n        coupons\n    WHERE\n        coupon_id NOT IN (SELECT coupon_id FROM orders)\n)\nSELECT\n    cu.coupon_id,\n    cu.order_count\nFROM\n    used_coupons cu\nUNION ALL\nSELECT\n    cu.coupon_id,\n    0 AS order_count\nFROM\n    unused_coupons cu;",
+      "final_sql": "WITH used_coupons AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n),\nunused_coupons AS (\n    SELECT\n        coupon_id\n    FROM\n        coupons\n    WHERE\n        coupon_id NOT IN (SELECT coupon_id FROM orders)\n)\nSELECT\n    cu.coupon_id,\n    cu.order_count\nFROM\n    used_coupons cu\nUNION ALL\nSELECT\n    cu.coupon_id,\n    0 AS order_count\nFROM\n    unused_coupons cu;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "coupon_id",
+          "order_count"
+        ],
+        "row_count": 7
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "coupon_id",
+          "order_count"
+        ],
+        "row_count": 7
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q14",
+      "question": "How many orders have no payment record?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) AS order_count\nFROM orders\nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "final_sql": "SELECT COUNT(*) AS order_count\nFROM orders\nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q15",
+      "question": "What is the total amount of successful payments by month?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS payment_month,\n        SUM(amount_cents) AS total_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n    GROUP BY \n        payment_month\n)\nSELECT \n    payment_month,\n    total_amount_cents\nFROM \n    successful_payments\nORDER BY \n    payment_month ASC;",
+      "final_sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS payment_month,\n        SUM(amount_cents) AS total_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n    GROUP BY \n        payment_month\n)\nSELECT \n    payment_month,\n    total_amount_cents\nFROM \n    successful_payments\nORDER BY \n    payment_month ASC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "payment_month",
+          "total_amount_cents"
+        ],
+        "row_count": 21
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "payment_month",
+          "total_amount_cents"
+        ],
+        "row_count": 21
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q16",
+      "question": "How many products does each supplier provide, including suppliers with no products?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    s.supplier_id,\n    s.name,\n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, s.name",
+      "final_sql": "SELECT \n    s.supplier_id,\n    s.name,\n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, s.name",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "product_count"
+        ],
+        "row_count": 12
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "product_count"
+        ],
+        "row_count": 12
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q17",
+      "question": "How many products currently have zero stock?",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) AS zero_stock_products_count\nFROM products\nWHERE stock_quantity = 0;",
+      "final_sql": "SELECT COUNT(*) AS zero_stock_products_count\nFROM products\nWHERE stock_quantity = 0;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "zero_stock_products_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "zero_stock_products_count"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q18",
+      "question": "How many reviews are there for each rating from 1 to 5?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating;",
+      "final_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "rating",
+          "review_count"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "rating",
+          "review_count"
+        ],
+        "row_count": 5
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q19",
+      "question": "Show the 10 most recently registered customers.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT full_name, email, city, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "final_sql": "SELECT full_name, email, city, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "email",
+          "city",
+          "registered_at"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "email",
+          "city",
+          "registered_at"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q20",
+      "question": "How many products are in each category?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    categories c\nLEFT JOIN \n    products p ON c.category_id = p.category_id\nGROUP BY \n    c.category_id, c.name",
+      "final_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    categories c\nLEFT JOIN \n    products p ON c.category_id = p.category_id\nGROUP BY \n    c.category_id, c.name",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "product_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "product_count"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q21",
+      "question": "Which five products were purchased in the largest quantities in delivered orders?",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "total_quantity"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "total_quantity"
+        ],
+        "row_count": 5
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q22",
+      "question": "Show the 10 most recent orders that used a coupon.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT o.order_id, o.customer_id, o.ordered_at, o.status, o.coupon_id\nFROM orders o\nJOIN coupons c ON o.coupon_id = c.coupon_id\nWHERE o.status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned')\nORDER BY o.ordered_at DESC\nLIMIT 10",
+      "final_sql": "SELECT o.order_id, o.customer_id, o.ordered_at, o.status, o.coupon_id\nFROM orders o\nJOIN coupons c ON o.coupon_id = c.coupon_id\nWHERE o.status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned')\nORDER BY o.ordered_at DESC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "ordered_at",
+          "status",
+          "coupon_id"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "ordered_at",
+          "status",
+          "coupon_id"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q23",
+      "question": "How many orders of each status were placed in 2026?",
+      "category": "date_filtering",
+      "mode": "baseline",
+      "initial_sql": "WITH order_counts AS (\n    SELECT \n        status,\n        COUNT(*) AS order_count\n    FROM \n        orders\n    WHERE \n        strftime('%Y', ordered_at) = '2026'\n    GROUP BY \n        status\n)\nSELECT \n    status,\n    order_count\nFROM \n    order_counts;",
+      "final_sql": "WITH order_counts AS (\n    SELECT \n        status,\n        COUNT(*) AS order_count\n    FROM \n        orders\n    WHERE \n        strftime('%Y', ordered_at) = '2026'\n    GROUP BY \n        status\n)\nSELECT \n    status,\n    order_count\nFROM \n    order_counts;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q24",
+      "question": "How many customers registered in each year?",
+      "category": "date_aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year ASC;",
+      "final_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year ASC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "registration_year",
+          "customer_count"
+        ],
+        "row_count": 2
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "registration_year",
+          "customer_count"
+        ],
+        "row_count": 2
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q25",
+      "question": "Which products have an average rating above 4 and at least three reviews? Show the first 10.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH product_reviews AS (\n    SELECT\n        product_id,\n        COUNT(*) AS review_count,\n        AVG(rating) AS average_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    pr.average_rating,\n    pr.review_count\nFROM\n    products p\nJOIN\n    product_reviews pr ON p.product_id = pr.product_id\nORDER BY\n    pr.average_rating DESC, p.product_id ASC\nLIMIT 10;",
+      "final_sql": "WITH product_reviews AS (\n    SELECT\n        product_id,\n        COUNT(*) AS review_count,\n        AVG(rating) AS average_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    pr.average_rating,\n    pr.review_count\nFROM\n    products p\nJOIN\n    product_reviews pr ON p.product_id = pr.product_id\nORDER BY\n    pr.average_rating DESC, p.product_id ASC\nLIMIT 10;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "average_rating",
+          "review_count"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "average_rating",
+          "review_count"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q26",
+      "question": "How many orders contain at least three distinct product line items?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "final_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 158
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 158
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q27",
+      "question": "How many payments are there for each status?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT status, COUNT(*) AS payment_count \nFROM payments \nGROUP BY status;",
+      "final_sql": "SELECT status, COUNT(*) AS payment_count \nFROM payments \nGROUP BY status;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "payment_count"
+        ],
+        "row_count": 4
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "payment_count"
+        ],
+        "row_count": 4
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q28",
+      "question": "How many shipments are there for each carrier?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH shipment_counts AS (\n    SELECT\n        carrier,\n        COUNT(*) AS shipment_count\n    FROM\n        shipments\n    GROUP BY\n        carrier\n)\nSELECT\n    carrier,\n    shipment_count\nFROM\n    shipment_counts\nORDER BY\n    shipment_count DESC,\n    carrier ASC;",
+      "final_sql": "WITH shipment_counts AS (\n    SELECT\n        carrier,\n        COUNT(*) AS shipment_count\n    FROM\n        shipments\n    GROUP BY\n        carrier\n)\nSELECT\n    carrier,\n    shipment_count\nFROM\n    shipment_counts\nORDER BY\n    shipment_count DESC,\n    carrier ASC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "carrier",
+          "shipment_count"
+        ],
+        "row_count": 3
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "carrier",
+          "shipment_count"
+        ],
+        "row_count": 3
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q29",
+      "question": "How many cancelled orders have no shipment record?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "WITH cancelled_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'cancelled'\n)\nSELECT COUNT(co.order_id) AS cancelled_orders_without_shipment\nFROM cancelled_orders co\nLEFT JOIN shipments s ON co.order_id = s.order_id\nWHERE s.order_id IS NULL;",
+      "final_sql": "WITH cancelled_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'cancelled'\n)\nSELECT COUNT(co.order_id) AS cancelled_orders_without_shipment\nFROM cancelled_orders co\nLEFT JOIN shipments s ON co.order_id = s.order_id\nWHERE s.order_id IS NULL;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "cancelled_orders_without_shipment"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "cancelled_orders_without_shipment"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    },
+    {
+      "test_id": "q30",
+      "question": "Show the 10 orders with the largest discounts, including order ID, status, and discount amount.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    order_id, \n    status, \n    discount_cents \nFROM \n    orders \nORDER BY \n    discount_cents DESC \nLIMIT 10;",
+      "final_sql": "SELECT \n    order_id, \n    status, \n    discount_cents \nFROM \n    orders \nORDER BY \n    discount_cents DESC \nLIMIT 10;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "status",
+          "discount_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "status",
+          "discount_cents"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null
+    }
+  ]
+}

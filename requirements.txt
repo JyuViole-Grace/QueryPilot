@@ -1,0 +1,5 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+# sql_quality.py reads tree.args["from_"], the key name used by recent sqlglot
+# releases. Run `pip show sqlglot` and pin the exact version you tested with.
+sqlglot>=28.0

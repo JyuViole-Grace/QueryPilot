@@ -1,0 +1,1239 @@
+{
+  "model": "qwen2.5:7b",
+  "mode": "baseline",
+  "oracle_assisted": false,
+  "max_correction_retries": 2,
+  "dataset": "golden",
+  "dataset_sha256_prefix": "ab2745c0843f1ab3",
+  "prompt_sha256_prefix": "22c87464718a540c",
+  "created_utc": "2026-10-28T22:43:23+00:00",
+  "summary": {
+    "total": 30,
+    "stages": {
+      "first_attempt": {
+        "executed": 29,
+        "strict": 6,
+        "execution_match": 16,
+        "lenient": 17
+      },
+      "final": {
+        "executed": 30,
+        "strict": 6,
+        "execution_match": 16,
+        "lenient": 17
+      }
+    },
+    "by_category": {
+      "filtering": {
+        "total": 2,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "aggregation": {
+        "total": 11,
+        "first_attempt_execution_match": 6,
+        "final_execution_match": 6
+      },
+      "joins": {
+        "total": 6,
+        "first_attempt_execution_match": 4,
+        "final_execution_match": 4
+      },
+      "subqueries": {
+        "total": 4,
+        "first_attempt_execution_match": 2,
+        "final_execution_match": 2
+      },
+      "sorting": {
+        "total": 3,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "multi_table_aggregation": {
+        "total": 2,
+        "first_attempt_execution_match": 0,
+        "final_execution_match": 0
+      },
+      "date_filtering": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "date_aggregation": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      }
+    },
+    "average_attempts": 1.03,
+    "stuck_on_same_sql": 0
+  },
+  "results": [
+    {
+      "test_id": "q01",
+      "question": "Какие активные товары стоят меньше 500 гривен? Покажи первые 10.",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "final_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q02",
+      "question": "Сколько покупателей живёт в каждом городе?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "final_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "q03",
+      "question": "Сколько покупателей ещё не сделали ни одного заказа?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "final_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "q04",
+      "question": "Сколько товаров ни разу не попадало ни в один заказ?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "final_sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "q05",
+      "question": "Какие товары не продавались в доставленных заказах?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "final_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 0
+      }
+    },
+    {
+      "test_id": "q06",
+      "question": "Покажи 10 самых дорогих товаров с названием и ценой.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "final_sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "price_cents"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q07",
+      "question": "Сколько заказов приходится на каждый статус?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "final_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      }
+    },
+    {
+      "test_id": "q08",
+      "question": "Какова помесячная выручка от доставленных заказов с учётом скидок?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS monthly_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS monthly_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "monthly_revenue_cents"
+        ],
+        "row_count": 21
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "monthly_revenue_cents"
+        ],
+        "row_count": 21
+      }
+    },
+    {
+      "test_id": "q09",
+      "question": "Какие категории имеют наибольшую стоимость проданных товаров в доставленных заказах до вычета скидок? Покажи все категории.",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+      "final_sql": "SELECT \n    c.name AS category_name,\n    SUM(oi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+      "attempts": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+          "error": "OperationalError: no such column: pi.quantity",
+          "feedback": "Запрос не выполнился.\nСообщение SQLite: OperationalError: no such column: pi.quantity\nПроверь синтаксис, названия таблиц и столбцов и связи между таблицами."
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": false,
+        "error": "OperationalError: no such column: pi.quantity",
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "total_revenue_cents"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "q10",
+      "question": "Покажи 10 товаров с наивысшим средним рейтингом, если у каждого есть не менее пяти отзывов.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        COUNT(review_id) >= 5\n)\nSELECT\n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM\n    products p\nJOIN\n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC\nLIMIT 10;",
+      "final_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        COUNT(review_id) >= 5\n)\nSELECT\n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM\n    products p\nJOIN\n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "avg_rating"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "avg_rating"
+        ],
+        "row_count": 6
+      }
+    },
+    {
+      "test_id": "q11",
+      "question": "Какие покупатели сделали больше трёх заказов? Покажи первых 10 по количеству заказов.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, c.full_name, c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC\nLIMIT 10;",
+      "final_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, c.full_name, c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "city",
+          "order_count"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "city",
+          "order_count"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q12",
+      "question": "Покажи 10 самых дорогих заказов после применения скидки.",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+      "final_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "ordered_at",
+          "status",
+          "total_cost_grivnas"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "ordered_at",
+          "status",
+          "total_cost_grivnas"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q13",
+      "question": "Сколько заказов использовало каждый купон? Покажи также купоны без заказов.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+      "final_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "coupon_id",
+          "code",
+          "order_count"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "coupon_id",
+          "code",
+          "order_count"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q14",
+      "question": "Сколько заказов не имеют ни одной записи о платеже?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "final_sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "q15",
+      "question": "Какова сумма успешных платежей по месяцам?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    strftime('%Y-%m', paid_at) AS month,\n    SUM(amount_cents) AS successful_payments_amount\nFROM \n    payments\nWHERE \n    status = 'successful'\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "final_sql": "SELECT \n    strftime('%Y-%m', paid_at) AS month,\n    SUM(amount_cents) AS successful_payments_amount\nFROM \n    payments\nWHERE \n    status = 'successful'\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "successful_payments_amount"
+        ],
+        "row_count": 21
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "successful_payments_amount"
+        ],
+        "row_count": 21
+      }
+    },
+    {
+      "test_id": "q16",
+      "question": "Сколько товаров поставляет каждый поставщик, включая поставщиков без товаров?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "final_sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "product_count"
+        ],
+        "row_count": 12
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "product_count"
+        ],
+        "row_count": 12
+      }
+    },
+    {
+      "test_id": "q17",
+      "question": "Сколько товаров сейчас имеют нулевой остаток на складе?",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+      "final_sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "zero_stock_products"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "zero_stock_products"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "q18",
+      "question": "Сколько отзывов получено для каждой оценки от 1 до 5?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "final_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "rating",
+          "review_count"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "rating",
+          "review_count"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "q19",
+      "question": "Покажи 10 последних зарегистрированных покупателей.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "final_sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "email",
+          "registered_at"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "email",
+          "registered_at"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q20",
+      "question": "Сколько товаров находится в каждой категории?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "final_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "product_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "product_count"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "q21",
+      "question": "Какие пять товаров купили в наибольшем количестве единиц в доставленных заказах?",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "total_quantity"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "total_quantity"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "q22",
+      "question": "Покажи 10 последних заказов, в которых применялся купон.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT order_id, customer_id, ordered_at, status, coupon_id, discount_cents\nFROM orders\nWHERE coupon_id IS NOT NULL\nORDER BY ordered_at DESC\nLIMIT 10;",
+      "final_sql": "SELECT order_id, customer_id, ordered_at, status, coupon_id, discount_cents\nFROM orders\nWHERE coupon_id IS NOT NULL\nORDER BY ordered_at DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "ordered_at",
+          "status",
+          "coupon_id",
+          "discount_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "ordered_at",
+          "status",
+          "coupon_id",
+          "discount_cents"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q23",
+      "question": "Сколько заказов каждого статуса было оформлено в 2026 году?",
+      "category": "date_filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "final_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      }
+    },
+    {
+      "test_id": "q24",
+      "question": "Сколько покупателей зарегистрировалось в каждом году?",
+      "category": "date_aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "final_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "registration_year",
+          "customer_count"
+        ],
+        "row_count": 2
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "registration_year",
+          "customer_count"
+        ],
+        "row_count": 2
+      }
+    },
+    {
+      "test_id": "q25",
+      "question": "Какие товары имеют средний рейтинг выше 4 и не менее трёх отзывов? Покажи первые 10.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    r.avg_rating,\n    r.review_count\nFROM\n    products p\nJOIN\n    avg_ratings r ON p.product_id = r.product_id\nORDER BY\n    r.avg_rating DESC, r.review_count DESC, p.name\nLIMIT 10;",
+      "final_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    r.avg_rating,\n    r.review_count\nFROM\n    products p\nJOIN\n    avg_ratings r ON p.product_id = r.product_id\nORDER BY\n    r.avg_rating DESC, r.review_count DESC, p.name\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "avg_rating",
+          "review_count"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "avg_rating",
+          "review_count"
+        ],
+        "row_count": 10
+      }
+    },
+    {
+      "test_id": "q26",
+      "question": "Сколько заказов содержат не менее трёх разных товарных позиций?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "final_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 158
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_count"
+        ],
+        "row_count": 158
+      }
+    },
+    {
+      "test_id": "q27",
+      "question": "Сколько платежей имеет каждый статус?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "final_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "payment_count"
+        ],
+        "row_count": 4
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "payment_count"
+        ],
+        "row_count": 4
+      }
+    },
+    {
+      "test_id": "q28",
+      "question": "Сколько отправлений приходится на каждого перевозчика?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "final_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "carrier",
+          "shipment_count"
+        ],
+        "row_count": 3
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "carrier",
+          "shipment_count"
+        ],
+        "row_count": 3
+      }
+    },
+    {
+      "test_id": "q29",
+      "question": "Сколько отменённых заказов не имеют записи о доставке?",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "final_sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "cancelled_orders_without_shipment"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "cancelled_orders_without_shipment"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "q30",
+      "question": "Покажи 10 заказов с наибольшей скидкой, включая номер, статус и размер скидки.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "final_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "status",
+          "discount_cents"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "status",
+          "discount_cents"
+        ],
+        "row_count": 10
+      }
+    }
+  ]
+}

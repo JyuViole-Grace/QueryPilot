@@ -1,0 +1,2124 @@
+{
+  "model": "qwen2.5:7b",
+  "mode": "quality_self_correction",
+  "oracle_assisted": false,
+  "quality_repair_enabled": true,
+  "critic_observe_enabled": false,
+  "deterministic_repairs_enabled": false,
+  "max_correction_retries": 2,
+  "dataset": "heldout_v3",
+  "dataset_version": 3,
+  "dataset_language": "en",
+  "dataset_test_count": 30,
+  "dataset_sha256_prefix": "d250f68cf7155892",
+  "prompt_sha256_prefix": "dfdb52e17d8a12fa",
+  "context_version": 2,
+  "resample_on_repeat_enabled": true,
+  "created_utc": "2026-11-04T01:41:07+00:00",
+  "summary": {
+    "deterministic_repair_attempts": 0,
+    "deterministic_repairs": 0,
+    "deterministic_repair_successes": 0,
+    "total": 30,
+    "stages": {
+      "first_attempt": {
+        "executed": 28,
+        "strict": 1,
+        "execution_match": 17,
+        "lenient": 17,
+        "relaxed": 22
+      },
+      "final": {
+        "executed": 29,
+        "strict": 1,
+        "execution_match": 18,
+        "lenient": 18,
+        "relaxed": 23
+      }
+    },
+    "critic": {
+      "valid": 29,
+      "invalid": 1,
+      "uncertain": 0,
+      "unavailable": 0,
+      "skipped": 0,
+      "total_reviews": 30,
+      "checked": 30,
+      "valid_rate": 0.9667,
+      "invalid_rate": 0.0333,
+      "uncertain_rate": 0.0
+    },
+    "by_category": {
+      "joins": {
+        "total": 5,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 2
+      },
+      "subqueries": {
+        "total": 6,
+        "first_attempt_execution_match": 4,
+        "final_execution_match": 4
+      },
+      "multi_table_aggregation": {
+        "total": 9,
+        "first_attempt_execution_match": 4,
+        "final_execution_match": 4
+      },
+      "aggregation": {
+        "total": 6,
+        "first_attempt_execution_match": 4,
+        "final_execution_match": 4
+      },
+      "date_aggregation": {
+        "total": 2,
+        "first_attempt_execution_match": 2,
+        "final_execution_match": 2
+      },
+      "filtering": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "sorting": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      }
+    },
+    "average_attempts": 1.17,
+    "average_generation_attempts": 1.17,
+    "stuck_on_same_sql": 0,
+    "quality_valid_after_repair": 30
+  },
+  "results": [
+    {
+      "test_id": "v3_01",
+      "question": "Which suppliers have products with an average rating above 4.5? Show supplier names and average ratings.",
+      "category": "joins",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT \n        p.supplier_id,\n        AVG(r.rating) AS average_rating\n    FROM \n        products p\n    JOIN \n        reviews r ON r.product_id = p.product_id\n    GROUP BY \n        p.supplier_id\n    HAVING \n        AVG(r.rating) > 4.5\n)\nSELECT \n    s.name AS supplier_name,\n    ar.average_rating\nFROM \n    suppliers s\nJOIN \n    avg_ratings ar ON ar.supplier_id = s.supplier_id;",
+      "final_sql": "WITH avg_ratings AS (\n    SELECT \n        p.supplier_id,\n        AVG(r.rating) AS average_rating\n    FROM \n        products p\n    JOIN \n        reviews r ON r.product_id = p.product_id\n    GROUP BY \n        p.supplier_id\n    HAVING \n        AVG(r.rating) > 4.5\n)\nSELECT \n    s.name AS supplier_name,\n    ar.average_rating\nFROM \n    suppliers s\nJOIN \n    avg_ratings ar ON ar.supplier_id = s.supplier_id;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH avg_ratings AS (\n    SELECT \n        p.supplier_id,\n        AVG(r.rating) AS average_rating\n    FROM \n        products p\n    JOIN \n        reviews r ON r.product_id = p.product_id\n    GROUP BY \n        p.supplier_id\n    HAVING \n        AVG(r.rating) > 4.5\n)\nSELECT \n    s.name AS supplier_name,\n    ar.average_rating\nFROM \n    suppliers s\nJOIN \n    avg_ratings ar ON ar.supplier_id = s.supplier_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "supplier_name",
+          "average_rating"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "supplier_name",
+          "average_rating"
+        ],
+        "row_count": 5
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_02",
+      "question": "Which customers have placed orders in at least three different calendar months? Show their IDs and names.",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT c.customer_id, c.full_name\nFROM customers c\nWHERE EXISTS (\n    SELECT 1\n    FROM orders o\n    WHERE o.customer_id = c.customer_id\n    GROUP BY strftime('%Y-%m', o.ordered_at)\n    HAVING COUNT(DISTINCT strftime('%Y-%m', o.ordered_at)) >= 3\n)",
+      "final_sql": "SELECT c.customer_id, c.full_name\nFROM customers c\nWHERE EXISTS (\n    SELECT 1\n    FROM orders o\n    WHERE o.customer_id = c.customer_id\n    GROUP BY strftime('%Y-%m', o.ordered_at)\n    HAVING COUNT(DISTINCT strftime('%Y-%m', o.ordered_at)) >= 3\n)",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT c.customer_id, c.full_name\nFROM customers c\nWHERE EXISTS (\n    SELECT 1\n    FROM orders o\n    WHERE o.customer_id = c.customer_id\n    GROUP BY strftime('%Y-%m', o.ordered_at)\n    HAVING COUNT(DISTINCT strftime('%Y-%m', o.ordered_at)) >= 3\n)",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 0
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_03",
+      "question": "How many products have a stock quantity greater than the average stock quantity of all products?",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT COUNT(*) AS products_above_average_stock\nFROM products\nWHERE stock_quantity > (SELECT AVG(stock_quantity) FROM products)",
+      "final_sql": "SELECT COUNT(*) AS products_above_average_stock\nFROM products\nWHERE stock_quantity > (SELECT AVG(stock_quantity) FROM products)",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(*) AS products_above_average_stock\nFROM products\nWHERE stock_quantity > (SELECT AVG(stock_quantity) FROM products)",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "products_above_average_stock"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "products_above_average_stock"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_04",
+      "question": "For each product category, show the total quantity sold in delivered orders.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity) AS total_quantity_sold\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity) AS total_quantity_sold\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity) AS total_quantity_sold\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "total_quantity_sold"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "total_quantity_sold"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_05",
+      "question": "Which suppliers have at least five products currently in stock? Show supplier IDs, names, and the number of in-stock products.",
+      "category": "joins",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN in_stock_products ip ON s.supplier_id = ip.product_id;",
+      "final_sql": "WITH in_stock_products AS (\n    SELECT supplier_id, COUNT(*) AS in_stock_product_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY supplier_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.in_stock_product_count\nFROM suppliers s\nLEFT JOIN in_stock_products ip ON s.supplier_id = ip.supplier_id;",
+      "attempts": 3,
+      "generation_attempts": 3,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN in_stock_products ip ON s.supplier_id = ip.product_id;",
+          "error": null,
+          "feedback": "Review and correct the SQL query.\nUser question: Which suppliers have at least five products currently in stock? Show supplier IDs, names, and the number of in-stock products.\nCurrent SQL: WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN in_stock_products ip ON s.supplier_id = ip.product_id;\nPreserve the meaning of the user's question.\nThe SQL quality validator reported these issues:\n- The join condition s.supplier_id = ip.product_id compares different key columns and is not a foreign-key relationship in this schema. Join only on matching foreign keys, for example orders.customer_id = customers.customer_id or order_items.order_id = orders.order_id.\nReturn only the corrected SQL query. Do not include explanations or Markdown fences.",
+          "quality_issues": [
+            "The join condition s.supplier_id = ip.product_id compares different key columns and is not a foreign-key relationship in this schema. Join only on matching foreign keys, for example orders.customer_id = customers.customer_id or order_items.order_id = orders.order_id."
+          ]
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN products p ON s.supplier_id = p.supplier_id\nJOIN in_stock_products ip ON p.product_id = ip.product_id;",
+          "error": null,
+          "feedback": "Review and correct the SQL query.\nUser question: Which suppliers have at least five products currently in stock? Show supplier IDs, names, and the number of in-stock products.\nCurrent SQL: WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN products p ON s.supplier_id = p.supplier_id\nJOIN in_stock_products ip ON p.product_id = ip.product_id;\nPreserve the meaning of the user's question.\nThe semantic critic found these issues:\n- R1: The SQL query incorrectly filters suppliers based on the count of products in stock. It uses a subquery to count products in stock, but this count is not correctly correlated with the supplier IDs. The HAVING clause should filter suppliers based on the count of their in-stock products, but the current query does not achieve this correctly. Additionally, the JOIN with the in_stock_products CTE is not necessary and introduces an incorrect filtering condition that removes suppliers with no in-stock products from the result set. Evidence: The SQL query uses a CTE to count products in stock, but it does not correctly correlate this count with the supplier IDs. The HAVING clause filters suppliers based on the count of products in stock, but this count is not correctly correlated with the supplier IDs. The JOIN with the in_stock_products CTE is not necessary and introduces an incorrect filtering condition that removes suppliers with no in-stock products from the result set.\nReturn only the corrected SQL query. Do not include explanations or Markdown fences.",
+          "quality_issues": []
+        }
+      ],
+      "semantic_reviews": [
+        {
+          "attempt": 2,
+          "sql": "WITH in_stock_products AS (\n    SELECT product_id, COUNT(*) AS stock_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY product_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.stock_count AS in_stock_product_count\nFROM suppliers s\nJOIN products p ON s.supplier_id = p.supplier_id\nJOIN in_stock_products ip ON p.product_id = ip.product_id;",
+          "verdict": "invalid",
+          "issues": [
+            "R1: The SQL query incorrectly filters suppliers based on the count of products in stock. It uses a subquery to count products in stock, but this count is not correctly correlated with the supplier IDs. The HAVING clause should filter suppliers based on the count of their in-stock products, but the current query does not achieve this correctly. Additionally, the JOIN with the in_stock_products CTE is not necessary and introduces an incorrect filtering condition that removes suppliers with no in-stock products from the result set. Evidence: The SQL query uses a CTE to count products in stock, but it does not correctly correlate this count with the supplier IDs. The HAVING clause filters suppliers based on the count of products in stock, but this count is not correctly correlated with the supplier IDs. The JOIN with the in_stock_products CTE is not necessary and introduces an incorrect filtering condition that removes suppliers with no in-stock products from the result set."
+          ],
+          "confidence": 1.0,
+          "status": "checked"
+        },
+        {
+          "attempt": 3,
+          "sql": "WITH in_stock_products AS (\n    SELECT supplier_id, COUNT(*) AS in_stock_product_count\n    FROM products\n    WHERE stock_quantity > 0\n    GROUP BY supplier_id\n    HAVING COUNT(*) >= 5\n)\nSELECT s.supplier_id, s.name, ip.in_stock_product_count\nFROM suppliers s\nLEFT JOIN in_stock_products ip ON s.supplier_id = ip.supplier_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "in_stock_product_count"
+        ],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "supplier_id",
+          "name",
+          "in_stock_product_count"
+        ],
+        "row_count": 12
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_06",
+      "question": "How many orders are there for each order status? Show the status and order count.",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH order_counts AS (\n    SELECT \n        status, \n        COUNT(*) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    status, \n    order_count\nFROM \n    order_counts;",
+      "final_sql": "WITH order_counts AS (\n    SELECT \n        status, \n        COUNT(*) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    status, \n    order_count\nFROM \n    order_counts;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH order_counts AS (\n    SELECT \n        status, \n        COUNT(*) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    status, \n    order_count\nFROM \n    order_counts;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "order_count"
+        ],
+        "row_count": 6
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_07",
+      "question": "What was the total value of delivered order items for each month? Show the month and revenue in cents.",
+      "category": "date_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    revenue_cents\nFROM \n    delivered_orders;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    revenue_cents\nFROM \n    delivered_orders;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    revenue_cents\nFROM \n    delivered_orders;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "revenue_cents"
+        ],
+        "row_count": 21
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "revenue_cents"
+        ],
+        "row_count": 21
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_08",
+      "question": "Find active products that have between 1 and 5 units in stock, inclusive. Show their names and stock quantities.",
+      "category": "filtering",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT \n    p.name AS product_name,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1 AND p.stock_quantity BETWEEN 1 AND 5;",
+      "final_sql": "SELECT \n    p.name AS product_name,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1 AND p.stock_quantity BETWEEN 1 AND 5;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    p.name AS product_name,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1 AND p.stock_quantity BETWEEN 1 AND 5;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "product_name",
+          "stock_quantity"
+        ],
+        "row_count": 2
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "product_name",
+          "stock_quantity"
+        ],
+        "row_count": 2
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_09",
+      "question": "Which customers have written at least three product reviews and have an average rating of at least 4? Show their names, review counts, and average ratings.",
+      "category": "joins",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH customer_reviews AS (\n    SELECT\n        r.customer_id,\n        COUNT(r.review_id) AS review_count,\n        AVG(r.rating) AS average_rating\n    FROM\n        reviews r\n    GROUP BY\n        r.customer_id\n    HAVING\n        COUNT(r.review_id) >= 3 AND AVG(r.rating) >= 4\n)\nSELECT\n    c.full_name,\n    cr.review_count,\n    cr.average_rating\nFROM\n    customers c\nJOIN\n    customer_reviews cr ON c.customer_id = cr.customer_id;",
+      "final_sql": "WITH customer_reviews AS (\n    SELECT\n        r.customer_id,\n        COUNT(r.review_id) AS review_count,\n        AVG(r.rating) AS average_rating\n    FROM\n        reviews r\n    GROUP BY\n        r.customer_id\n    HAVING\n        COUNT(r.review_id) >= 3 AND AVG(r.rating) >= 4\n)\nSELECT\n    c.full_name,\n    cr.review_count,\n    cr.average_rating\nFROM\n    customers c\nJOIN\n    customer_reviews cr ON c.customer_id = cr.customer_id;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH customer_reviews AS (\n    SELECT\n        r.customer_id,\n        COUNT(r.review_id) AS review_count,\n        AVG(r.rating) AS average_rating\n    FROM\n        reviews r\n    GROUP BY\n        r.customer_id\n    HAVING\n        COUNT(r.review_id) >= 3 AND AVG(r.rating) >= 4\n)\nSELECT\n    c.full_name,\n    cr.review_count,\n    cr.average_rating\nFROM\n    customers c\nJOIN\n    customer_reviews cr ON c.customer_id = cr.customer_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "review_count",
+          "average_rating"
+        ],
+        "row_count": 29
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "full_name",
+          "review_count",
+          "average_rating"
+        ],
+        "row_count": 29
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_10",
+      "question": "For each city, calculate the total value of delivered order items in cents. Include only cities with at least five delivered orders. Show the city, number of delivered orders, and revenue.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT\n        o.customer_id,\n        c.city,\n        COUNT(*) AS delivered_order_count,\n        SUM(oi.quantity * oi.unit_price_cents) AS delivered_revenue_cents\n    FROM\n        orders o\n    JOIN\n        order_items oi ON oi.order_id = o.order_id\n    JOIN\n        customers c ON c.customer_id = o.customer_id\n    WHERE\n        o.status = 'delivered'\n    GROUP BY\n        o.customer_id, c.city\n    HAVING\n        COUNT(*) >= 5\n)\nSELECT\n    city,\n    delivered_order_count,\n    delivered_revenue_cents\nFROM\n    delivered_orders;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT\n        o.customer_id,\n        c.city,\n        COUNT(*) AS delivered_order_count,\n        SUM(oi.quantity * oi.unit_price_cents) AS delivered_revenue_cents\n    FROM\n        orders o\n    JOIN\n        order_items oi ON oi.order_id = o.order_id\n    JOIN\n        customers c ON c.customer_id = o.customer_id\n    WHERE\n        o.status = 'delivered'\n    GROUP BY\n        o.customer_id, c.city\n    HAVING\n        COUNT(*) >= 5\n)\nSELECT\n    city,\n    delivered_order_count,\n    delivered_revenue_cents\nFROM\n    delivered_orders;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT\n        o.customer_id,\n        c.city,\n        COUNT(*) AS delivered_order_count,\n        SUM(oi.quantity * oi.unit_price_cents) AS delivered_revenue_cents\n    FROM\n        orders o\n    JOIN\n        order_items oi ON oi.order_id = o.order_id\n    JOIN\n        customers c ON c.customer_id = o.customer_id\n    WHERE\n        o.status = 'delivered'\n    GROUP BY\n        o.customer_id, c.city\n    HAVING\n        COUNT(*) >= 5\n)\nSELECT\n    city,\n    delivered_order_count,\n    delivered_revenue_cents\nFROM\n    delivered_orders;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "city",
+          "delivered_order_count",
+          "delivered_revenue_cents"
+        ],
+        "row_count": 29
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "city",
+          "delivered_order_count",
+          "delivered_revenue_cents"
+        ],
+        "row_count": 29
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_11",
+      "question": "Which products have a price higher than the average price of products in their own category? Show product name, category, and price in cents.",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH avg_price_per_category AS (\n    SELECT\n        p.category_id,\n        AVG(p.price_cents) AS avg_price\n    FROM\n        products p\n    GROUP BY\n        p.category_id\n)\nSELECT\n    p.name,\n    c.name AS category,\n    p.price_cents\nFROM\n    products p\nJOIN\n    categories c ON p.category_id = c.category_id\nJOIN\n    avg_price_per_category apc ON p.category_id = apc.category_id\nWHERE\n    p.price_cents > apc.avg_price;",
+      "final_sql": "WITH avg_price_per_category AS (\n    SELECT\n        p.category_id,\n        AVG(p.price_cents) AS avg_price\n    FROM\n        products p\n    GROUP BY\n        p.category_id\n)\nSELECT\n    p.name,\n    c.name AS category,\n    p.price_cents\nFROM\n    products p\nJOIN\n    categories c ON p.category_id = c.category_id\nJOIN\n    avg_price_per_category apc ON p.category_id = apc.category_id\nWHERE\n    p.price_cents > apc.avg_price;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH avg_price_per_category AS (\n    SELECT\n        p.category_id,\n        AVG(p.price_cents) AS avg_price\n    FROM\n        products p\n    GROUP BY\n        p.category_id\n)\nSELECT\n    p.name,\n    c.name AS category,\n    p.price_cents\nFROM\n    products p\nJOIN\n    categories c ON p.category_id = c.category_id\nJOIN\n    avg_price_per_category apc ON p.category_id = apc.category_id\nWHERE\n    p.price_cents > apc.avg_price;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "category",
+          "price_cents"
+        ],
+        "row_count": 45
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "category",
+          "price_cents"
+        ],
+        "row_count": 45
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_12",
+      "question": "How many customers are registered in each city? Show cities with at least five customers.",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT city, COUNT(*) AS customer_count\nFROM customers\nGROUP BY city\nHAVING COUNT(*) >= 5;",
+      "final_sql": "SELECT city, COUNT(*) AS customer_count\nFROM customers\nGROUP BY city\nHAVING COUNT(*) >= 5;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT city, COUNT(*) AS customer_count\nFROM customers\nGROUP BY city\nHAVING COUNT(*) >= 5;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "city",
+          "customer_count"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_13",
+      "question": "List orders that have a payment record with a failed status. Show order ID, customer ID, order status, and payment amount in cents.",
+      "category": "joins",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT \n    o.order_id, \n    o.customer_id, \n    o.status, \n    p.amount_cents \nFROM \n    orders o \nJOIN \n    payments p ON p.order_id = o.order_id \nWHERE \n    p.status = 'failed'",
+      "final_sql": "SELECT \n    o.order_id, \n    o.customer_id, \n    o.status, \n    p.amount_cents \nFROM \n    orders o \nJOIN \n    payments p ON p.order_id = o.order_id \nWHERE \n    p.status = 'failed'",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    o.order_id, \n    o.customer_id, \n    o.status, \n    p.amount_cents \nFROM \n    orders o \nJOIN \n    payments p ON p.order_id = o.order_id \nWHERE \n    p.status = 'failed'",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "status",
+          "amount_cents"
+        ],
+        "row_count": 22
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "customer_id",
+          "status",
+          "amount_cents"
+        ],
+        "row_count": 22
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_14",
+      "question": "How many orders were placed in each month of 2026? Show the month and order count.",
+      "category": "date_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT \n    strftime('%Y-%m', ordered_at) AS month,\n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    month\nORDER BY \n    month ASC;",
+      "final_sql": "SELECT \n    strftime('%Y-%m', ordered_at) AS month,\n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    month\nORDER BY \n    month ASC;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    strftime('%Y-%m', ordered_at) AS month,\n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    month\nORDER BY \n    month ASC;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "order_count"
+        ],
+        "row_count": 9
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "month",
+          "order_count"
+        ],
+        "row_count": 9
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_15",
+      "question": "Which customers have placed orders but have never received a delivered shipment? Show their customer IDs and names.",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT o.customer_id\n    FROM orders o\n    LEFT JOIN shipments s ON s.order_id = o.order_id\n    WHERE s.status = 'delivered'\n    GROUP BY o.customer_id\n    HAVING COUNT(s.shipment_id) = 0\n)\nSELECT c.customer_id, c.full_name\nFROM customers c\nJOIN delivered_orders do ON c.customer_id = do.customer_id;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT o.customer_id\n    FROM orders o\n    LEFT JOIN shipments s ON s.order_id = o.order_id\n    WHERE s.status = 'delivered'\n    GROUP BY o.customer_id\n    HAVING COUNT(s.shipment_id) = 0\n)\nSELECT c.customer_id, c.full_name\nFROM customers c\nJOIN delivered_orders do ON c.customer_id = do.customer_id;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT o.customer_id\n    FROM orders o\n    LEFT JOIN shipments s ON s.order_id = o.order_id\n    WHERE s.status = 'delivered'\n    GROUP BY o.customer_id\n    HAVING COUNT(s.shipment_id) = 0\n)\nSELECT c.customer_id, c.full_name\nFROM customers c\nJOIN delivered_orders do ON c.customer_id = do.customer_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 0
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_16",
+      "question": "For each payment status, show the number of payments and the total payment amount in cents.",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH payment_status_summary AS (\n    SELECT\n        status AS payment_status,\n        COUNT(*) AS payment_count,\n        SUM(amount_cents) AS total_payment_amount_cents\n    FROM\n        payments\n    GROUP BY\n        status\n)\nSELECT * FROM payment_status_summary;",
+      "final_sql": "WITH payment_status_summary AS (\n    SELECT\n        status AS payment_status,\n        COUNT(*) AS payment_count,\n        SUM(amount_cents) AS total_payment_amount_cents\n    FROM\n        payments\n    GROUP BY\n        status\n)\nSELECT * FROM payment_status_summary;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH payment_status_summary AS (\n    SELECT\n        status AS payment_status,\n        COUNT(*) AS payment_count,\n        SUM(amount_cents) AS total_payment_amount_cents\n    FROM\n        payments\n    GROUP BY\n        status\n)\nSELECT * FROM payment_status_summary;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "payment_status",
+          "payment_count",
+          "total_payment_amount_cents"
+        ],
+        "row_count": 4
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "payment_status",
+          "payment_count",
+          "total_payment_amount_cents"
+        ],
+        "row_count": 4
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_17",
+      "question": "Which coupons have been used in at least three orders? Show the coupon code and number of orders using it.",
+      "category": "joins",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH used_coupons AS (\n    SELECT\n        o.coupon_id,\n        COUNT(*) AS order_count\n    FROM\n        orders o\n    WHERE\n        o.coupon_id IS NOT NULL\n    GROUP BY\n        o.coupon_id\n    HAVING\n        COUNT(*) >= 3\n)\nSELECT\n    c.code AS coupon_code,\n    uc.order_count AS number_of_orders\nFROM\n    coupons c\nJOIN\n    used_coupons uc ON c.coupon_id = uc.coupon_id;",
+      "final_sql": "WITH used_coupons AS (\n    SELECT\n        o.coupon_id,\n        COUNT(*) AS order_count\n    FROM\n        orders o\n    WHERE\n        o.coupon_id IS NOT NULL\n    GROUP BY\n        o.coupon_id\n    HAVING\n        COUNT(*) >= 3\n)\nSELECT\n    c.code AS coupon_code,\n    uc.order_count AS number_of_orders\nFROM\n    coupons c\nJOIN\n    used_coupons uc ON c.coupon_id = uc.coupon_id;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH used_coupons AS (\n    SELECT\n        o.coupon_id,\n        COUNT(*) AS order_count\n    FROM\n        orders o\n    WHERE\n        o.coupon_id IS NOT NULL\n    GROUP BY\n        o.coupon_id\n    HAVING\n        COUNT(*) >= 3\n)\nSELECT\n    c.code AS coupon_code,\n    uc.order_count AS number_of_orders\nFROM\n    coupons c\nJOIN\n    used_coupons uc ON c.coupon_id = uc.coupon_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "coupon_code",
+          "number_of_orders"
+        ],
+        "row_count": 7
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "coupon_code",
+          "number_of_orders"
+        ],
+        "row_count": 7
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_18",
+      "question": "For each product category, show the average review rating and the number of reviews. Include only categories with at least ten reviews.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH category_reviews AS (\n    SELECT\n        categories.category_id,\n        AVG(reviews.rating) AS average_rating,\n        COUNT(reviews.review_id) AS review_count\n    FROM\n        categories\n    LEFT JOIN\n        products ON categories.category_id = products.category_id\n    LEFT JOIN\n        reviews ON products.product_id = reviews.product_id\n    GROUP BY\n        categories.category_id\n    HAVING\n        COUNT(reviews.review_id) >= 10\n)\nSELECT\n    category_id,\n    average_rating,\n    review_count\nFROM\n    category_reviews;",
+      "final_sql": "WITH category_reviews AS (\n    SELECT\n        categories.category_id,\n        AVG(reviews.rating) AS average_rating,\n        COUNT(reviews.review_id) AS review_count\n    FROM\n        categories\n    LEFT JOIN\n        products ON categories.category_id = products.category_id\n    LEFT JOIN\n        reviews ON products.product_id = reviews.product_id\n    GROUP BY\n        categories.category_id\n    HAVING\n        COUNT(reviews.review_id) >= 10\n)\nSELECT\n    category_id,\n    average_rating,\n    review_count\nFROM\n    category_reviews;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH category_reviews AS (\n    SELECT\n        categories.category_id,\n        AVG(reviews.rating) AS average_rating,\n        COUNT(reviews.review_id) AS review_count\n    FROM\n        categories\n    LEFT JOIN\n        products ON categories.category_id = products.category_id\n    LEFT JOIN\n        reviews ON products.product_id = reviews.product_id\n    GROUP BY\n        categories.category_id\n    HAVING\n        COUNT(reviews.review_id) >= 10\n)\nSELECT\n    category_id,\n    average_rating,\n    review_count\nFROM\n    category_reviews;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "category_id",
+          "average_rating",
+          "review_count"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": false,
+        "columns": [
+          "category_id",
+          "average_rating",
+          "review_count"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_19",
+      "question": "For each shipping carrier, show the number of shipments and the number that have been delivered.",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH shipment_counts AS (\n    SELECT\n        s.carrier,\n        COUNT(*) AS total_shipments,\n        COUNT(CASE WHEN s.status = 'delivered' THEN s.shipment_id ELSE NULL END) AS delivered_shipments\n    FROM\n        shipments s\n    GROUP BY\n        s.carrier\n)\nSELECT\n    carrier,\n    total_shipments,\n    delivered_shipments\nFROM\n    shipment_counts;",
+      "final_sql": "WITH shipment_counts AS (\n    SELECT\n        s.carrier,\n        COUNT(*) AS total_shipments,\n        COUNT(CASE WHEN s.status = 'delivered' THEN s.shipment_id ELSE NULL END) AS delivered_shipments\n    FROM\n        shipments s\n    GROUP BY\n        s.carrier\n)\nSELECT\n    carrier,\n    total_shipments,\n    delivered_shipments\nFROM\n    shipment_counts;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH shipment_counts AS (\n    SELECT\n        s.carrier,\n        COUNT(*) AS total_shipments,\n        COUNT(CASE WHEN s.status = 'delivered' THEN s.shipment_id ELSE NULL END) AS delivered_shipments\n    FROM\n        shipments s\n    GROUP BY\n        s.carrier\n)\nSELECT\n    carrier,\n    total_shipments,\n    delivered_shipments\nFROM\n    shipment_counts;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "carrier",
+          "total_shipments",
+          "delivered_shipments"
+        ],
+        "row_count": 3
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "carrier",
+          "total_shipments",
+          "delivered_shipments"
+        ],
+        "row_count": 3
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_20",
+      "question": "Which products have generated more than 100000 cents in item revenue from delivered orders? Show product names and revenue in cents.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders_items AS (\n    SELECT\n        order_items.product_id,\n        SUM(order_items.quantity * order_items.unit_price_cents) AS item_revenue_cents\n    FROM\n        order_items\n    JOIN\n        orders ON order_items.order_id = orders.order_id\n    WHERE\n        orders.status = 'delivered'\n    GROUP BY\n        order_items.product_id\n    HAVING\n        SUM(order_items.quantity * order_items.unit_price_cents) > 100000\n)\nSELECT\n    products.name,\n    item_revenue_cents\nFROM\n    delivered_orders_items\nJOIN\n    products ON delivered_orders_items.product_id = products.product_id;",
+      "final_sql": "WITH delivered_orders_items AS (\n    SELECT\n        order_items.product_id,\n        SUM(order_items.quantity * order_items.unit_price_cents) AS item_revenue_cents\n    FROM\n        order_items\n    JOIN\n        orders ON order_items.order_id = orders.order_id\n    WHERE\n        orders.status = 'delivered'\n    GROUP BY\n        order_items.product_id\n    HAVING\n        SUM(order_items.quantity * order_items.unit_price_cents) > 100000\n)\nSELECT\n    products.name,\n    item_revenue_cents\nFROM\n    delivered_orders_items\nJOIN\n    products ON delivered_orders_items.product_id = products.product_id;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders_items AS (\n    SELECT\n        order_items.product_id,\n        SUM(order_items.quantity * order_items.unit_price_cents) AS item_revenue_cents\n    FROM\n        order_items\n    JOIN\n        orders ON order_items.order_id = orders.order_id\n    WHERE\n        orders.status = 'delivered'\n    GROUP BY\n        order_items.product_id\n    HAVING\n        SUM(order_items.quantity * order_items.unit_price_cents) > 100000\n)\nSELECT\n    products.name,\n    item_revenue_cents\nFROM\n    delivered_orders_items\nJOIN\n    products ON delivered_orders_items.product_id = products.product_id;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "item_revenue_cents"
+        ],
+        "row_count": 70
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "name",
+          "item_revenue_cents"
+        ],
+        "row_count": 70
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_21",
+      "question": "For each supplier country, show the number of suppliers and the number of products they supply.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH supplier_products AS (\n    SELECT \n        s.supplier_id,\n        s.country,\n        COUNT(DISTINCT p.product_id) AS product_count\n    FROM \n        suppliers s\n    JOIN \n        products p ON p.supplier_id = s.supplier_id\n    GROUP BY \n        s.supplier_id, s.country\n)\nSELECT \n    country,\n    COUNT(supplier_id) AS supplier_count,\n    SUM(product_count) AS total_products\nFROM \n    supplier_products\nGROUP BY \n    country;",
+      "final_sql": "WITH supplier_products AS (\n    SELECT \n        s.supplier_id,\n        s.country,\n        COUNT(DISTINCT p.product_id) AS product_count\n    FROM \n        suppliers s\n    JOIN \n        products p ON p.supplier_id = s.supplier_id\n    GROUP BY \n        s.supplier_id, s.country\n)\nSELECT \n    country,\n    COUNT(supplier_id) AS supplier_count,\n    SUM(product_count) AS total_products\nFROM \n    supplier_products\nGROUP BY \n    country;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH supplier_products AS (\n    SELECT \n        s.supplier_id,\n        s.country,\n        COUNT(DISTINCT p.product_id) AS product_count\n    FROM \n        suppliers s\n    JOIN \n        products p ON p.supplier_id = s.supplier_id\n    GROUP BY \n        s.supplier_id, s.country\n)\nSELECT \n    country,\n    COUNT(supplier_id) AS supplier_count,\n    SUM(product_count) AS total_products\nFROM \n    supplier_products\nGROUP BY \n    country;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "country",
+          "supplier_count",
+          "total_products"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "country",
+          "supplier_count",
+          "total_products"
+        ],
+        "row_count": 5
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_22",
+      "question": "Which customers have placed at least four orders? Show their IDs, names, and order counts.",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT \n    c.customer_id,\n    c.full_name,\n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nLEFT JOIN \n    orders o ON c.customer_id = o.customer_id\nWHERE \n    o.status IN ('cancelled', 'delivered', 'pending', 'processing', 'returned', 'shipped')\nGROUP BY \n    c.customer_id, c.full_name\nHAVING \n    COUNT(o.order_id) >= 4",
+      "final_sql": "SELECT \n    c.customer_id,\n    c.full_name,\n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nLEFT JOIN \n    orders o ON c.customer_id = o.customer_id\nWHERE \n    o.status IN ('cancelled', 'delivered', 'pending', 'processing', 'returned', 'shipped')\nGROUP BY \n    c.customer_id, c.full_name\nHAVING \n    COUNT(o.order_id) >= 4",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.customer_id,\n    c.full_name,\n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nLEFT JOIN \n    orders o ON c.customer_id = o.customer_id\nWHERE \n    o.status IN ('cancelled', 'delivered', 'pending', 'processing', 'returned', 'shipped')\nGROUP BY \n    c.customer_id, c.full_name\nHAVING \n    COUNT(o.order_id) >= 4",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 39
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 39
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_23",
+      "question": "Which products have never received a review? Show their product IDs and names.",
+      "category": "subqueries",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT products.product_id, products.name\nFROM products\nLEFT JOIN reviews ON products.product_id = reviews.product_id\nWHERE reviews.review_id IS NULL;",
+      "final_sql": "SELECT products.product_id, products.name\nFROM products\nLEFT JOIN reviews ON products.product_id = reviews.product_id\nWHERE reviews.review_id IS NULL;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT products.product_id, products.name\nFROM products\nLEFT JOIN reviews ON products.product_id = reviews.product_id\nWHERE reviews.review_id IS NULL;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 7
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name"
+        ],
+        "row_count": 7
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_24",
+      "question": "For each shipping carrier, calculate the average number of days between shipment and delivery, using only delivered shipments.",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_shipments AS (\n    SELECT\n        s.carrier,\n        s.shipment_id,\n        s.shipped_at,\n        s.delivered_at\n    FROM\n        shipments s\n    WHERE\n        s.status = 'delivered'\n)\n\nSELECT\n    carrier,\n    AVG(julianday(delivered_at) - julianday(shipped_at)) AS average_days_between_shipment_and_delivery\nFROM\n    delivered_shipments\nGROUP BY\n    carrier;",
+      "final_sql": "WITH delivered_shipments AS (\n    SELECT\n        s.carrier,\n        s.shipment_id,\n        s.shipped_at,\n        s.delivered_at\n    FROM\n        shipments s\n    WHERE\n        s.status = 'delivered'\n)\n\nSELECT\n    carrier,\n    AVG(julianday(delivered_at) - julianday(shipped_at)) AS average_days_between_shipment_and_delivery\nFROM\n    delivered_shipments\nGROUP BY\n    carrier;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_shipments AS (\n    SELECT\n        s.carrier,\n        s.shipment_id,\n        s.shipped_at,\n        s.delivered_at\n    FROM\n        shipments s\n    WHERE\n        s.status = 'delivered'\n)\n\nSELECT\n    carrier,\n    AVG(julianday(delivered_at) - julianday(shipped_at)) AS average_days_between_shipment_and_delivery\nFROM\n    delivered_shipments\nGROUP BY\n    carrier;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "carrier",
+          "average_days_between_shipment_and_delivery"
+        ],
+        "row_count": 3
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "carrier",
+          "average_days_between_shipment_and_delivery"
+        ],
+        "row_count": 3
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_25",
+      "question": "For each product category, calculate the revenue from delivered order items. Show the category name and revenue in cents.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM orders\n    WHERE status = 'delivered'\n)\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    delivered_orders do ON oi.order_id = do.order_id\nGROUP BY \n    c.name;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "revenue_cents"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": true,
+        "columns": [
+          "category_name",
+          "revenue_cents"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_26",
+      "question": "Show the ten most expensive active products, including their names, prices in cents, and stock quantities.",
+      "category": "sorting",
+      "mode": "quality_self_correction",
+      "initial_sql": "SELECT \n    p.name AS product_name,\n    p.price_cents AS price_cents,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1\nORDER BY \n    p.price_cents DESC\nLIMIT 10",
+      "final_sql": "SELECT \n    p.name AS product_name,\n    p.price_cents AS price_cents,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1\nORDER BY \n    p.price_cents DESC\nLIMIT 10",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    p.name AS product_name,\n    p.price_cents AS price_cents,\n    p.stock_quantity AS stock_quantity\nFROM \n    products p\nWHERE \n    p.is_active = 1\nORDER BY \n    p.price_cents DESC\nLIMIT 10",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "product_name",
+          "price_cents",
+          "stock_quantity"
+        ],
+        "row_count": 10
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "product_name",
+          "price_cents",
+          "stock_quantity"
+        ],
+        "row_count": 10
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_27",
+      "question": "What is the average discount percentage among active coupons?",
+      "category": "aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH active_coupons AS (\n    SELECT coupon_id, discount_percent\n    FROM coupons\n    WHERE is_active = 1\n)\nSELECT AVG(discount_percent) AS average_discount_percentage\nFROM active_coupons;",
+      "final_sql": "WITH active_coupons AS (\n    SELECT coupon_id, discount_percent\n    FROM coupons\n    WHERE is_active = 1\n)\nSELECT AVG(discount_percent) AS average_discount_percentage\nFROM active_coupons;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH active_coupons AS (\n    SELECT coupon_id, discount_percent\n    FROM coupons\n    WHERE is_active = 1\n)\nSELECT AVG(discount_percent) AS average_discount_percentage\nFROM active_coupons;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "average_discount_percentage"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "average_discount_percentage"
+        ],
+        "row_count": 1
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_28",
+      "question": "For each category, show the minimum and maximum product prices in cents, considering active products only.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH active_products AS (\n    SELECT product_id\n    FROM products\n    WHERE is_active = 1\n)\nSELECT\n    categories.name AS category_name,\n    MIN(products.price_cents) AS min_price_cents,\n    MAX(products.price_cents) AS max_price_cents\nFROM\n    products\nJOIN\n    active_products ON products.product_id = active_products.product_id\nJOIN\n    categories ON products.category_id = categories.category_id\nGROUP BY\n    categories.name;",
+      "final_sql": "WITH active_products AS (\n    SELECT product_id\n    FROM products\n    WHERE is_active = 1\n)\nSELECT\n    categories.name AS category_name,\n    MIN(products.price_cents) AS min_price_cents,\n    MAX(products.price_cents) AS max_price_cents\nFROM\n    products\nJOIN\n    active_products ON products.product_id = active_products.product_id\nJOIN\n    categories ON products.category_id = categories.category_id\nGROUP BY\n    categories.name;",
+      "attempts": 1,
+      "generation_attempts": 1,
+      "correction_history": [],
+      "semantic_reviews": [
+        {
+          "attempt": 1,
+          "sql": "WITH active_products AS (\n    SELECT product_id\n    FROM products\n    WHERE is_active = 1\n)\nSELECT\n    categories.name AS category_name,\n    MIN(products.price_cents) AS min_price_cents,\n    MAX(products.price_cents) AS max_price_cents\nFROM\n    products\nJOIN\n    active_products ON products.product_id = active_products.product_id\nJOIN\n    categories ON products.category_id = categories.category_id\nGROUP BY\n    categories.name;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "min_price_cents",
+          "max_price_cents"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "relaxed": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "min_price_cents",
+          "max_price_cents"
+        ],
+        "row_count": 8
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_29",
+      "question": "Which customers have purchased products from at least four different categories in delivered orders? Show customer IDs and names.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY c.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY c.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4",
+      "attempts": 3,
+      "generation_attempts": 3,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY c.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4",
+          "error": "OperationalError: no such column: p.category_id",
+          "feedback": "Review and correct the SQL query.\nUser question: Which customers have purchased products from at least four different categories in delivered orders? Show customer IDs and names.\nCurrent SQL: WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY c.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4\nPreserve the meaning of the user's question.\nThe query failed to execute. Execution error: OperationalError: no such column: p.category_id\nReturn only the corrected SQL query. Do not include explanations or Markdown fences.",
+          "quality_issues": []
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY d.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4",
+          "error": "OperationalError: no such column: p.category_id",
+          "feedback": "Review and correct the SQL query.\nUser question: Which customers have purchased products from at least four different categories in delivered orders? Show customer IDs and names.\nCurrent SQL: WITH delivered_orders AS (\n    SELECT DISTINCT o.customer_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT c.customer_id, c.full_name\nFROM delivered_orders d\nJOIN customers c ON d.customer_id = c.customer_id\nGROUP BY d.customer_id, c.full_name\nHAVING COUNT(DISTINCT p.category_id) >= 4\nPreserve the meaning of the user's question.\nThe query failed to execute. Execution error: OperationalError: no such column: p.category_id\nReturn only the corrected SQL query. Do not include explanations or Markdown fences.",
+          "quality_issues": []
+        }
+      ],
+      "semantic_reviews": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": false,
+        "error": "OperationalError: no such column: p.category_id",
+        "strict": null,
+        "execution_match": null,
+        "lenient": null,
+        "relaxed": null,
+        "columns_match": null,
+        "columns": [],
+        "row_count": 0
+      },
+      "final": {
+        "executed": false,
+        "error": "OperationalError: no such column: p.category_id",
+        "strict": null,
+        "execution_match": null,
+        "lenient": null,
+        "relaxed": null,
+        "columns_match": null,
+        "columns": [],
+        "row_count": 0
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": null,
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    },
+    {
+      "test_id": "v3_30",
+      "question": "For each order status, show the average number of items per order, counting item quantities rather than order-item rows.",
+      "category": "multi_table_aggregation",
+      "mode": "quality_self_correction",
+      "initial_sql": "WITH order_status_counts AS (\n    SELECT \n        status,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    os.status,\n    AVG(oi.quantity) AS average_items_per_order\nFROM \n    order_status_counts os\nLEFT JOIN \n    order_items oi ON os.order_id = oi.order_id\nGROUP BY \n    os.status;",
+      "final_sql": "WITH order_status_counts AS (\n    SELECT \n        status,\n        order_id\n    FROM \n        orders\n)\nSELECT \n    os.status,\n    AVG(oi.quantity) AS average_items_per_order\nFROM \n    order_status_counts os\nLEFT JOIN \n    order_items oi ON os.order_id = oi.order_id\nGROUP BY \n    os.status;",
+      "attempts": 2,
+      "generation_attempts": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH order_status_counts AS (\n    SELECT \n        status,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    os.status,\n    AVG(oi.quantity) AS average_items_per_order\nFROM \n    order_status_counts os\nLEFT JOIN \n    order_items oi ON os.order_id = oi.order_id\nGROUP BY \n    os.status;",
+          "error": "OperationalError: no such column: os.order_id",
+          "feedback": "Review and correct the SQL query.\nUser question: For each order status, show the average number of items per order, counting item quantities rather than order-item rows.\nCurrent SQL: WITH order_status_counts AS (\n    SELECT \n        status,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    GROUP BY \n        status\n)\nSELECT \n    os.status,\n    AVG(oi.quantity) AS average_items_per_order\nFROM \n    order_status_counts os\nLEFT JOIN \n    order_items oi ON os.order_id = oi.order_id\nGROUP BY \n    os.status;\nPreserve the meaning of the user's question.\nThe query failed to execute. Execution error: OperationalError: no such column: os.order_id\nReturn only the corrected SQL query. Do not include explanations or Markdown fences.",
+          "quality_issues": []
+        }
+      ],
+      "semantic_reviews": [
+        {
+          "attempt": 2,
+          "sql": "WITH order_status_counts AS (\n    SELECT \n        status,\n        order_id\n    FROM \n        orders\n)\nSELECT \n    os.status,\n    AVG(oi.quantity) AS average_items_per_order\nFROM \n    order_status_counts os\nLEFT JOIN \n    order_items oi ON os.order_id = oi.order_id\nGROUP BY \n    os.status;",
+          "verdict": "valid",
+          "issues": [],
+          "confidence": 1.0,
+          "status": "checked"
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": false,
+        "error": "OperationalError: no such column: os.order_id",
+        "strict": null,
+        "execution_match": null,
+        "lenient": null,
+        "relaxed": null,
+        "columns_match": null,
+        "columns": [],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "relaxed": false,
+        "columns_match": true,
+        "columns": [
+          "status",
+          "average_items_per_order"
+        ],
+        "row_count": 6
+      },
+      "deterministic_repair": {
+        "attempted": false,
+        "applied": false,
+        "original_sql": null
+      },
+      "final_semantic_review": {
+        "verdict": "valid",
+        "issues": [],
+        "confidence": 1.0,
+        "status": "checked"
+      },
+      "final_quality": {
+        "valid": true,
+        "issues": []
+      }
+    }
+  ]
+}

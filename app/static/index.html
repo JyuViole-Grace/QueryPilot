@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QueryPilot — Safe Text-to-SQL</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2369d2a4'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h8' stroke='%23101318' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #0e1218; --panel: #161c25; --panel-2: #1c2431; --line: #2a3443;
+      --text: #e8edf2; --muted: #93a1b3; --accent: #69d2a4; --accent-ink: #0b2a1e;
+      --warn: #f2c14e; --error: #ff7a7a; --kw: #7cc4ff; --str: #f2c14e; --num: #c4a1ff; --com: #6b7a8d;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text);
+           font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 960px; margin: 0 auto; padding: 40px 20px 72px; }
+    header { margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 36px; height: 36px; border-radius: 9px; background: var(--accent); display: grid; place-items: center; }
+    .logo svg { width: 20px; height: 20px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+    .tagline { margin: 8px 0 0; color: var(--muted); }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .pill { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    textarea { width: 100%; min-height: 92px; resize: vertical; padding: 14px 16px; color: var(--text);
+               background: var(--panel); border: 1px solid var(--line); border-radius: 10px; font: inherit; }
+    textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+    .actions { display: flex; align-items: center; gap: 14px; margin: 14px 0 6px; flex-wrap: wrap; }
+    button { font: inherit; cursor: pointer; }
+    #send { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 0; border-radius: 9px;
+            background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+    #send:hover:not(:disabled) { filter: brightness(1.08); }
+    #send:disabled { opacity: .65; cursor: progress; }
+    .hint { color: var(--muted); font-size: 13px; }
+    kbd { font: 12px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(11,42,30,.35); border-top-color: var(--accent-ink);
+               border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+    #send.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 28px; }
+    .examples span { font-size: 13px; color: var(--muted); align-self: center; margin-right: 2px; }
+    .chip { padding: 5px 12px; font-size: 13px; color: var(--text); background: var(--panel);
+            border: 1px solid var(--line); border-radius: 999px; }
+    .chip:hover { border-color: var(--accent); }
+
+    section.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-top: 18px; overflow: hidden; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+                 padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel-2);
+                 font-size: 13px; color: var(--muted); }
+    .card-head strong { color: var(--text); font-weight: 600; }
+    .copy { font-size: 12px; color: var(--muted); background: transparent; border: 1px solid var(--line);
+            border-radius: 6px; padding: 2px 10px; }
+    .copy:hover { color: var(--text); border-color: var(--accent); }
+    pre.sql { margin: 0; padding: 16px; overflow-x: auto; font: 14px/1.6 var(--mono); white-space: pre; }
+    .tk-kw { color: var(--kw); font-weight: 600; } .tk-str { color: var(--str); }
+    .tk-num { color: var(--num); } .tk-com { color: var(--com); font-style: italic; }
+
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .meta .pill strong { color: var(--text); font-weight: 600; }
+    .pill.warn { color: var(--warn); border-color: rgba(242,193,78,.45); }
+
+    .table-wrap { max-height: 420px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 16px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--line); }
+    th { position: sticky; top: 0; background: var(--panel-2); color: var(--muted); font-weight: 600; font-size: 12px;
+         text-transform: uppercase; letter-spacing: .04em; }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,.02); }
+    tbody tr:hover { background: rgba(105,210,164,.07); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.null { color: var(--com); font-style: italic; }
+    .empty { padding: 20px 16px; color: var(--muted); }
+
+    .alert { margin-top: 18px; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,122,122,.5);
+             background: rgba(255,122,122,.08); color: var(--error); }
+    .alert b { color: var(--text); }
+    #status { color: var(--muted); font-size: 14px; }
+    footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0b2a1e" stroke-width="3" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h8"/></svg>
+      </div>
+      <h1>QueryPilot</h1>
+    </div>
+    <p class="tagline">Ask a question in plain English. A local model writes the SQL, a read-only sandbox runs it.</p>
+    <div class="badges">
+      <span class="pill">Local LLM (Ollama)</span>
+      <span class="pill">Read-only SQLite</span>
+      <span class="pill">Quality checks &amp; self-correction</span>
+    </div>
+  </header>
+
+  <label for="question">Your question</label>
+  <textarea id="question" placeholder="For example: Show the five most expensive products with their prices in cents."></textarea>
+  <div class="actions">
+    <button id="send" type="button"><span class="spinner" aria-hidden="true"></span><span id="send-label">Ask</span></button>
+    <span class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to run</span>
+  </div>
+
+  <div class="examples" id="examples" aria-label="Example questions">
+    <span>Try:</span>
+  </div>
+
+  <div id="status" role="status" aria-live="polite"></div>
+  <div id="output"></div>
+
+  <footer>Sample data: a synthetic e-commerce database (customers, orders, products, payments, shipments, reviews).</footer>
+</main>
+
+<script>
+  const EXAMPLES = [
+    ["Products per category", "For each product category, show the category name and the number of products."],
+    ["Top customers", "Which five customers have placed the most orders? Show the customer name and the number of orders."],
+    ["Revenue by month", "What was the total value of delivered order items in cents for each month of 2026? Show the month and the total."],
+    ["Biggest suppliers", "Which suppliers provide the most products? Show the supplier name and the number of products."],
+    ["Priciest products", "Show the five most expensive products with their prices in cents."],
+    ["Orders by status", "How many orders are there for each order status? Show the status and the number of orders."],
+  ];
+
+  const KEYWORDS = new Set(("select from where group by order having limit offset join left right inner outer cross on as and or not in is null " +
+    "like between exists case when then else end distinct union all with desc asc count sum avg min max round cast coalesce " +
+    "strftime substr length upper lower over partition").split(" "));
+
+  // Split SQL into [type, text] tokens; rendering uses textContent only (no HTML injection).
+  function tokenizeSql(sql) {
+    const pattern = /(--[^\n]*)|('(?:[^']|'')*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][A-Za-z_0-9]*)/g;
+    const tokens = [];
+    let last = 0, match;
+    while ((match = pattern.exec(sql)) !== null) {
+      if (match.index > last) tokens.push(["text", sql.slice(last, match.index)]);
+      if (match[1]) tokens.push(["com", match[1]]);
+      else if (match[2]) tokens.push(["str", match[2]]);
+      else if (match[3]) tokens.push(["num", match[3]]);
+      else tokens.push([KEYWORDS.has(match[4].toLowerCase()) ? "kw" : "text", match[4]]);
+      last = pattern.lastIndex;
+    }
+    if (last < sql.length) tokens.push(["text", sql.slice(last)]);
+    return tokens;
+  }
+
+  function isNumeric(value) { return typeof value === "number" && Number.isFinite(value); }
+
+  function formatCell(value) {
+    if (value === null || value === undefined) return { text: "NULL", cls: "null" };
+    if (isNumeric(value)) return { text: Number.isInteger(value) ? String(value) : String(Math.round(value * 100) / 100), cls: "num" };
+    return { text: String(value), cls: "" };
+  }
+
+  function errorMessage(status, data) {
+    let detail = data && data.detail;
+    if (Array.isArray(detail)) detail = detail.map(item => item.msg || JSON.stringify(item)).join("; ");
+    return { status, detail: typeof detail === "string" ? detail : "Unexpected error." };
+  }
+
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (key === "class") node.className = value; else if (key === "text") node.textContent = value; else node.setAttribute(key, value);
+    }
+    for (const child of children) node.append(child);
+    return node;
+  }
+
+  function pill(label, value, warn) {
+    const node = el("span", { class: warn ? "pill warn" : "pill" });
+    node.append(label + " ");
+    node.append(el("strong", { text: value }));
+    return node;
+  }
+
+  function renderSql(sql) {
+    const code = el("pre", { class: "sql" });
+    for (const [type, text] of tokenizeSql(sql)) {
+      code.append(type === "text" ? document.createTextNode(text) : el("span", { class: "tk-" + type, text }));
+    }
+    const copy = el("button", { class: "copy", type: "button", text: "Copy" });
+    copy.onclick = async () => {
+      try { await navigator.clipboard.writeText(sql); copy.textContent = "Copied"; } catch { copy.textContent = "Copy failed"; }
+      setTimeout(() => { copy.textContent = "Copy"; }, 1500);
+    };
+    return el("section", { class: "card" }, [
+      el("div", { class: "card-head" }, [el("strong", { text: "Generated SQL" }), copy]), code,
+    ]);
+  }
+
+  function renderTable(columns, rows) {
+    const head = el("tr");
+    const numeric = columns.map((_, i) => rows.length > 0 && rows.every(r => r[i] === null || isNumeric(r[i])));
+    columns.forEach((name, i) => head.append(el("th", { class: numeric[i] ? "num" : "", text: name })));
+    const body = el("tbody");
+    for (const row of rows) {
+      const tr = el("tr");
+      row.forEach((value, i) => {
+        const cell = formatCell(value);
+        tr.append(el("td", { class: [numeric[i] ? "num" : "", cell.cls === "null" ? "null" : ""].join(" ").trim(), text: cell.text }));
+      });
+      body.append(tr);
+    }
+    const content = rows.length
+      ? el("div", { class: "table-wrap" }, [el("table", {}, [el("thead", {}, [head]), body])])
+      : el("div", { class: "empty", text: "The query returned no rows." });
+    return el("section", { class: "card" }, [
+      el("div", { class: "card-head" }, [el("strong", { text: "Result" }), el("span", { text: rows.length + (rows.length === 1 ? " row" : " rows") })]),
+      content,
+    ]);
+  }
+
+  function renderResult(data) {
+    const meta = el("div", { class: "meta" });
+    meta.append(pill("Rows", String(data.rows.length)));
+    meta.append(pill("Time", (Number(data.execution_time_seconds) * 1000).toFixed(1) + " ms"));
+    if (data.quality_repair_attempts) meta.append(pill("Self-corrected", data.quality_repair_attempts + "×"));
+    if (data.truncated) meta.append(pill("Truncated", "first rows only", true));
+    return [meta, renderSql(data.sql), renderTable(data.columns, data.rows)];
+  }
+
+  // ---- wiring (skipped when the script is loaded outside a browser, e.g. in unit tests) ----
+  if (typeof document !== "undefined" && document.getElementById("send")) {
+    const questionBox = document.getElementById("question");
+    const sendButton = document.getElementById("send");
+    const sendLabel = document.getElementById("send-label");
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
+
+    for (const [label, text] of EXAMPLES) {
+      const chip = el("button", { class: "chip", type: "button", title: text, text: label });
+      chip.onclick = () => { questionBox.value = text; questionBox.focus(); };
+      document.getElementById("examples").append(chip);
+    }
+
+    function setBusy(busy) {
+      sendButton.disabled = busy;
+      sendButton.classList.toggle("loading", busy);
+      sendLabel.textContent = busy ? "Running…" : "Ask";
+    }
+
+    async function ask() {
+      const question = questionBox.value.trim();
+      output.replaceChildren();
+      status.textContent = "";
+      if (!question) { status.textContent = "Please enter a question."; return; }
+      setBusy(true);
+      try {
+        const response = await fetch("/api/query", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question }),
+        });
+        const data = await response.json().catch(() => null);
+        if (!response.ok) {
+          const { status: code, detail } = errorMessage(response.status, data);
+          output.append(el("div", { class: "alert", role: "alert" }, [el("b", { text: "Error " + code + ". " }), detail]));
+        } else {
+          output.append(...renderResult(data));
+        }
+      } catch (error) {
+        output.append(el("div", { class: "alert", role: "alert" }, [el("b", { text: "Network error. " }), String(error)]));
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    sendButton.onclick = ask;
+    questionBox.addEventListener("keydown", event => { if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) ask(); });
+  }
+</script>
+</body>
+</html>

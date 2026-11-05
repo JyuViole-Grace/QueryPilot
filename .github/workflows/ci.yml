@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    # A regression in the query timeout makes a test hang, so cap the job.
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
+
+      # No Ollama or models are needed: the generator is faked in the tests.
+      - name: Byte-compile sources
+        run: python -m compileall -q app scripts tests
+
+      - name: Run tests
+        run: pytest -q

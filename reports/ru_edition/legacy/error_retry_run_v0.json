@@ -1,0 +1,530 @@
+{
+  "model": "qwen2.5:7b",
+  "max_correction_retries": 2,
+  "summary": {
+    "total": 30,
+    "passed": 6,
+    "failed": 24,
+    "success_rate": 20.0
+  },
+  "results": [
+    {
+      "test_id": "q01",
+      "passed": false,
+      "columns_match": true,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "initial_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q02",
+      "passed": false,
+      "columns_match": true,
+      "results_match": false,
+      "actual_row_count": 8,
+      "expected_row_count": 8,
+      "error": null,
+      "details": [
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "initial_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q03",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 1,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['customers_without_orders'], получены ['COUNT(*)']."
+      ],
+      "generated_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "initial_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q04",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 1,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['products_never_ordered'], получены ['COUNT(*)']."
+      ],
+      "generated_sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "initial_sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q05",
+      "passed": false,
+      "columns_match": true,
+      "results_match": false,
+      "actual_row_count": 0,
+      "expected_row_count": 3,
+      "error": null,
+      "details": [
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "initial_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q06",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['product_id', 'name', 'price_cents'], получены ['name', 'price_cents'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "initial_sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q07",
+      "passed": false,
+      "columns_match": true,
+      "results_match": false,
+      "actual_row_count": 6,
+      "expected_row_count": 6,
+      "error": null,
+      "details": [
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "initial_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q08",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 21,
+      "expected_row_count": 21,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['month', 'revenue_cents'], получены ['month', 'monthly_revenue_cents'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS monthly_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS monthly_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q09",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 8,
+      "expected_row_count": 8,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['category_name', 'gross_sales_cents'], получены ['category_name', 'total_revenue_cents'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT \n    c.name AS category_name,\n    SUM(oi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+          "error_type": "execution_error",
+          "error": "no such column: pi.quantity"
+        }
+      ]
+    },
+    {
+      "test_id": "q10",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 6,
+      "expected_row_count": 6,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'avg_rating'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        COUNT(review_id) >= 5\n)\nSELECT\n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM\n    products p\nJOIN\n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC\nLIMIT 10;",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        COUNT(review_id) >= 5\n)\nSELECT\n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM\n    products p\nJOIN\n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q11",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['customer_id', 'full_name', 'order_count'], получены ['customer_id', 'full_name', 'city', 'order_count'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, c.full_name, c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC\nLIMIT 10;",
+      "initial_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, c.full_name, c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q12",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['order_id', 'status', 'total_cents'], получены ['order_id', 'ordered_at', 'status', 'total_cost_grivnas'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+      "initial_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q13",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['coupon_id', 'code', 'usage_count'], получены ['coupon_id', 'code', 'order_count'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+      "initial_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q14",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 1,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['orders_without_payments'], получены ['COUNT(*)']."
+      ],
+      "generated_sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "initial_sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q15",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 21,
+      "expected_row_count": 21,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['month', 'successful_amount_cents'], получены ['month', 'successful_payments_amount']."
+      ],
+      "generated_sql": "SELECT \n    strftime('%Y-%m', paid_at) AS month,\n    SUM(amount_cents) AS successful_payments_amount\nFROM \n    payments\nWHERE \n    status = 'successful'\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "initial_sql": "SELECT \n    strftime('%Y-%m', paid_at) AS month,\n    SUM(amount_cents) AS successful_payments_amount\nFROM \n    payments\nWHERE \n    status = 'successful'\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q16",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 12,
+      "expected_row_count": 12,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['supplier_id', 'supplier_name', 'product_count'], получены ['supplier_id', 'name', 'product_count'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "initial_sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q17",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 1,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['out_of_stock_count'], получены ['zero_stock_products']."
+      ],
+      "generated_sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+      "initial_sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q18",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 5,
+      "expected_row_count": 5,
+      "error": null,
+      "details": [],
+      "generated_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "initial_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q19",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['customer_id', 'full_name', 'city', 'registered_at'], получены ['full_name', 'email', 'registered_at'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "initial_sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q20",
+      "passed": false,
+      "columns_match": true,
+      "results_match": false,
+      "actual_row_count": 8,
+      "expected_row_count": 8,
+      "error": null,
+      "details": [
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q21",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 5,
+      "expected_row_count": 5,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['product_id', 'name', 'units_sold'], получены ['product_id', 'name', 'total_quantity'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS total_quantity\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q22",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['order_id', 'ordered_at', 'coupon_code', 'discount_cents'], получены ['order_id', 'customer_id', 'ordered_at', 'status', 'coupon_id', 'discount_cents'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT order_id, customer_id, ordered_at, status, coupon_id, discount_cents\nFROM orders\nWHERE coupon_id IS NOT NULL\nORDER BY ordered_at DESC\nLIMIT 10;",
+      "initial_sql": "SELECT order_id, customer_id, ordered_at, status, coupon_id, discount_cents\nFROM orders\nWHERE coupon_id IS NOT NULL\nORDER BY ordered_at DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q23",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 6,
+      "expected_row_count": 6,
+      "error": null,
+      "details": [],
+      "generated_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "initial_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q24",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 2,
+      "expected_row_count": 2,
+      "error": null,
+      "details": [],
+      "generated_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "initial_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q25",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'avg_rating', 'review_count'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    r.avg_rating,\n    r.review_count\nFROM\n    products p\nJOIN\n    avg_ratings r ON p.product_id = r.product_id\nORDER BY\n    r.avg_rating DESC, r.review_count DESC, p.name\nLIMIT 10;",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    r.avg_rating,\n    r.review_count\nFROM\n    products p\nJOIN\n    avg_ratings r ON p.product_id = r.product_id\nORDER BY\n    r.avg_rating DESC, r.review_count DESC, p.name\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q26",
+      "passed": false,
+      "columns_match": false,
+      "results_match": false,
+      "actual_row_count": 158,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['orders_with_three_or_more_items'], получены ['order_count'].",
+        "Результаты отличаются от эталона."
+      ],
+      "generated_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "initial_sql": "SELECT COUNT(DISTINCT order_id) AS order_count\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q27",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 4,
+      "expected_row_count": 4,
+      "error": null,
+      "details": [],
+      "generated_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "initial_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q28",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 3,
+      "expected_row_count": 3,
+      "error": null,
+      "details": [],
+      "generated_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "initial_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q29",
+      "passed": false,
+      "columns_match": false,
+      "results_match": true,
+      "actual_row_count": 1,
+      "expected_row_count": 1,
+      "error": null,
+      "details": [
+        "Столбцы отличаются: ожидались ['cancelled_without_shipment'], получены ['cancelled_orders_without_shipment']."
+      ],
+      "generated_sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "initial_sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    },
+    {
+      "test_id": "q30",
+      "passed": true,
+      "columns_match": true,
+      "results_match": true,
+      "actual_row_count": 10,
+      "expected_row_count": 10,
+      "error": null,
+      "details": [],
+      "generated_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "initial_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": []
+    }
+  ]
+}

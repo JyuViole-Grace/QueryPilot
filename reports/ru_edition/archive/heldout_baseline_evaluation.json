@@ -1,0 +1,1219 @@
+{
+  "model": "qwen2.5:7b",
+  "mode": "baseline",
+  "oracle_assisted": false,
+  "max_correction_retries": 2,
+  "dataset": "heldout",
+  "dataset_sha256_prefix": "4af74661725d3a23",
+  "prompt_sha256_prefix": "22c87464718a540c",
+  "created_utc": "2026-10-25T02:08:21+00:00",
+  "summary": {
+    "total": 30,
+    "stages": {
+      "first_attempt": {
+        "executed": 29,
+        "strict": 7,
+        "execution_match": 20,
+        "lenient": 20
+      },
+      "final": {
+        "executed": 30,
+        "strict": 7,
+        "execution_match": 20,
+        "lenient": 20
+      }
+    },
+    "by_category": {
+      "filtering": {
+        "total": 3,
+        "first_attempt_execution_match": 3,
+        "final_execution_match": 3
+      },
+      "aggregation": {
+        "total": 9,
+        "first_attempt_execution_match": 8,
+        "final_execution_match": 8
+      },
+      "joins": {
+        "total": 5,
+        "first_attempt_execution_match": 2,
+        "final_execution_match": 2
+      },
+      "subqueries": {
+        "total": 4,
+        "first_attempt_execution_match": 3,
+        "final_execution_match": 3
+      },
+      "sorting": {
+        "total": 3,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      },
+      "multi_table_aggregation": {
+        "total": 3,
+        "first_attempt_execution_match": 0,
+        "final_execution_match": 0
+      },
+      "date_filtering": {
+        "total": 2,
+        "first_attempt_execution_match": 2,
+        "final_execution_match": 2
+      },
+      "date_aggregation": {
+        "total": 1,
+        "first_attempt_execution_match": 1,
+        "final_execution_match": 1
+      }
+    },
+    "average_attempts": 1.07,
+    "stuck_on_same_sql": 0
+  },
+  "results": [
+    {
+      "test_id": "h01",
+      "question": "Какие товары сейчас неактивны? Покажи id, название и цену, по возрастанию id.",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 0 \nORDER BY product_id ASC",
+      "final_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 0 \nORDER BY product_id ASC",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 6
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 6
+      }
+    },
+    {
+      "test_id": "h02",
+      "question": "Какие покупатели из Одессы зарегистрировались после 1 июля 2024 года? Покажи id и имя.",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT customer_id, full_name\nFROM customers\nWHERE city = 'Одесса' AND registered_at > '2024-07-01';",
+      "final_sql": "SELECT customer_id, full_name\nFROM customers\nWHERE city = 'Одесса' AND registered_at > '2024-07-01';",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "customer_id",
+          "full_name"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h03",
+      "question": "Сколько платежей на сумму больше 1000 гривен завершились неудачей?",
+      "category": "filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM payments \nWHERE amount_cents > 100000 AND status = 'failed'",
+      "final_sql": "SELECT COUNT(*) \nFROM payments \nWHERE amount_cents > 100000 AND status = 'failed'",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h04",
+      "question": "Какова средняя цена товаров в каждой категории? Покажи название категории и среднюю цену в копейках, округлённую до целого.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    CAST(AVG(p.price_cents) AS INTEGER) AS average_price_cents\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name",
+      "final_sql": "SELECT \n    c.name AS category_name,\n    CAST(AVG(p.price_cents) AS INTEGER) AS average_price_cents\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "average_price_cents"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "average_price_cents"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "h05",
+      "question": "Сколько единиц товаров лежит на складе в каждой категории? Покажи название категории и общее количество.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    SUM(p.stock_quantity) AS total_stock\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    c.name\nLIMIT 100;",
+      "final_sql": "SELECT \n    c.name AS category_name,\n    SUM(p.stock_quantity) AS total_stock\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    c.name\nLIMIT 100;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "total_stock"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "category_name",
+          "total_stock"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "h06",
+      "question": "Какова общая сумма скидок по заказам для каждого купона? Покажи код купона и сумму в копейках, только для купонов, которые использовались.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.code AS coupon_code,\n    SUM(o.discount_cents) AS total_discount_cents\nFROM \n    orders o\nJOIN \n    coupons c ON o.coupon_id = c.coupon_id\nGROUP BY \n    c.code\nORDER BY \n    total_discount_cents DESC, c.code;",
+      "final_sql": "SELECT \n    c.code AS coupon_code,\n    SUM(o.discount_cents) AS total_discount_cents\nFROM \n    orders o\nJOIN \n    coupons c ON o.coupon_id = c.coupon_id\nGROUP BY \n    c.code\nORDER BY \n    total_discount_cents DESC, c.code;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "coupon_code",
+          "total_discount_cents"
+        ],
+        "row_count": 7
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "coupon_code",
+          "total_discount_cents"
+        ],
+        "row_count": 7
+      }
+    },
+    {
+      "test_id": "h07",
+      "question": "Сколько всего единиц товаров продано в доставленных заказах?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT SUM(order_items.quantity) AS total_units_sold\nFROM order_items\nJOIN orders ON order_items.order_id = orders.order_id\nWHERE orders.status = 'delivered'",
+      "final_sql": "SELECT SUM(order_items.quantity) AS total_units_sold\nFROM order_items\nJOIN orders ON order_items.order_id = orders.order_id\nWHERE orders.status = 'delivered'",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "total_units_sold"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "total_units_sold"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h08",
+      "question": "Сколько товарных позиций в среднем приходится на один заказ? Округли до двух знаков.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    AVG(quantity) AS average_items_per_order\nFROM \n    order_items;",
+      "final_sql": "SELECT \n    AVG(quantity) AS average_items_per_order\nFROM \n    order_items;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "average_items_per_order"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "average_items_per_order"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h09",
+      "question": "Какова минимальная, максимальная и средняя цена активных товаров? Среднюю округли до целого. Покажи три значения в копейках.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    MIN(p.price_cents) AS min_price_cents,\n    MAX(p.price_cents) AS max_price_cents,\n    ROUND(AVG(p.price_cents)) AS avg_price_cents\nFROM \n    products p\nWHERE \n    p.is_active = 1;",
+      "final_sql": "SELECT \n    MIN(p.price_cents) AS min_price_cents,\n    MAX(p.price_cents) AS max_price_cents,\n    ROUND(AVG(p.price_cents)) AS avg_price_cents\nFROM \n    products p\nWHERE \n    p.is_active = 1;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "min_price_cents",
+          "max_price_cents",
+          "avg_price_cents"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "min_price_cents",
+          "max_price_cents",
+          "avg_price_cents"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h10",
+      "question": "Сколько разных товаров получили хотя бы один отзыв с оценкой 1 или 2?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH relevant_reviews AS (\n    SELECT DISTINCT product_id\n    FROM reviews\n    WHERE rating IN (1, 2)\n)\nSELECT COUNT(DISTINCT product_id) AS count_of_products\nFROM relevant_reviews;",
+      "final_sql": "WITH relevant_reviews AS (\n    SELECT DISTINCT product_id\n    FROM reviews\n    WHERE rating IN (1, 2)\n)\nSELECT COUNT(DISTINCT product_id) AS count_of_products\nFROM relevant_reviews;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "count_of_products"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "count_of_products"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h11",
+      "question": "Какова суммарная стоимость всех товарных позиций (количество × цена позиции) во всех заказах? Покажи одно число в копейках.",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT SUM(quantity * unit_price_cents) AS total_cost_cents\nFROM order_items;",
+      "final_sql": "SELECT SUM(quantity * unit_price_cents) AS total_cost_cents\nFROM order_items;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "total_cost_cents"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "total_cost_cents"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h12",
+      "question": "Сколько покупателей оставили хотя бы один отзыв?",
+      "category": "aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(DISTINCT customer_id) AS customer_count\nFROM reviews",
+      "final_sql": "SELECT COUNT(DISTINCT customer_id) AS customer_count\nFROM reviews",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h13",
+      "question": "Покажи id товара, название товара и название поставщика для поставщиков из Польши. Отсортируй по id товара.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT p.product_id, p.name, s.name AS supplier_name\nFROM products p\nJOIN suppliers s ON p.supplier_id = s.supplier_id\nWHERE s.country = 'Польша'\nORDER BY p.product_id;",
+      "final_sql": "SELECT p.product_id, p.name, s.name AS supplier_name\nFROM products p\nJOIN suppliers s ON p.supplier_id = s.supplier_id\nWHERE s.country = 'Польша'\nORDER BY p.product_id;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "supplier_name"
+        ],
+        "row_count": 20
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "supplier_name"
+        ],
+        "row_count": 20
+      }
+    },
+    {
+      "test_id": "h14",
+      "question": "Покажи номер, имя покупателя и город для каждого возвращённого заказа.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    o.order_id,\n    c.full_name,\n    c.city\nFROM \n    orders o\nJOIN \n    customers c ON o.customer_id = c.customer_id\nWHERE \n    o.status = 'delivered'\nORDER BY \n    c.city, c.full_name\nLIMIT 100;",
+      "final_sql": "SELECT \n    o.order_id,\n    c.full_name,\n    c.city\nFROM \n    orders o\nJOIN \n    customers c ON o.customer_id = c.customer_id\nWHERE \n    o.status = 'delivered'\nORDER BY \n    c.city, c.full_name\nLIMIT 100;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "full_name",
+          "city"
+        ],
+        "row_count": 100
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "full_name",
+          "city"
+        ],
+        "row_count": 100
+      }
+    },
+    {
+      "test_id": "h15",
+      "question": "Сколько заказов оформил каждый покупатель из Киева, включая тех, у кого заказов нет? Покажи имя и количество.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.full_name,\n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nLEFT JOIN \n    orders o ON c.customer_id = o.customer_id AND c.city = 'Киев'\nGROUP BY \n    c.customer_id, c.full_name\nORDER BY \n    order_count DESC, c.full_name;",
+      "final_sql": "SELECT \n    c.full_name,\n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nLEFT JOIN \n    orders o ON c.customer_id = o.customer_id AND c.city = 'Киев'\nGROUP BY \n    c.customer_id, c.full_name\nORDER BY \n    order_count DESC, c.full_name;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 100
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "full_name",
+          "order_count"
+        ],
+        "row_count": 100
+      }
+    },
+    {
+      "test_id": "h16",
+      "question": "Какие перевозчики участвовали в отправке возвращённых заказов? Покажи названия без повторов.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "WITH returned_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'returned'\n)\n\nSELECT DISTINCT s.carrier\nFROM shipments s\nJOIN returned_orders ro ON s.order_id = ro.order_id",
+      "final_sql": "WITH returned_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'returned'\n)\n\nSELECT DISTINCT s.carrier\nFROM shipments s\nJOIN returned_orders ro ON s.order_id = ro.order_id",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "carrier"
+        ],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "carrier"
+        ],
+        "row_count": 0
+      }
+    },
+    {
+      "test_id": "h17",
+      "question": "Покажи 5 последних доставок: номер заказа, перевозчик и дата доставки.",
+      "category": "joins",
+      "mode": "baseline",
+      "initial_sql": "SELECT order_id, carrier, delivered_at\nFROM shipments\nWHERE delivered_at IS NOT NULL\nORDER BY delivered_at DESC\nLIMIT 5",
+      "final_sql": "SELECT order_id, carrier, delivered_at\nFROM shipments\nWHERE delivered_at IS NOT NULL\nORDER BY delivered_at DESC\nLIMIT 5",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "carrier",
+          "delivered_at"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "order_id",
+          "carrier",
+          "delivered_at"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "h18",
+      "question": "Какие товары стоят дороже средней цены всех товаров? Покажи id, название и цену.",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE price_cents > (SELECT AVG(price_cents) FROM products)",
+      "final_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE price_cents > (SELECT AVG(price_cents) FROM products)",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 43
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "product_id",
+          "name",
+          "price_cents"
+        ],
+        "row_count": 43
+      }
+    },
+    {
+      "test_id": "h19",
+      "question": "Сколько покупателей не оставили ни одного отзыва?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM reviews)",
+      "final_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM reviews)",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h20",
+      "question": "Сколько заказов содержат хотя бы один товар из категории «Ноутбуки»?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(DISTINCT o.order_id) \nFROM orders o\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN categories c ON p.category_id = c.category_id\nWHERE c.name = 'Ноутбуки'",
+      "final_sql": "SELECT COUNT(DISTINCT o.order_id) \nFROM orders o\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN categories c ON p.category_id = c.category_id\nWHERE c.name = 'Ноутбуки'",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(DISTINCT o.order_id)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(DISTINCT o.order_id)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h21",
+      "question": "Сколько покупателей имеют хотя бы один отменённый заказ, но ни одного доставленного?",
+      "category": "subqueries",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(DISTINCT c.customer_id) AS customer_count\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled'\nAND s.status IS NULL;",
+      "final_sql": "SELECT COUNT(DISTINCT c.customer_id) AS customer_count\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled'\nAND s.status IS NULL;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": true,
+        "columns": [
+          "customer_count"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h22",
+      "question": "Покажи 5 самых дешёвых активных товаров: id, название и цену.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT product_id, name, price_cents / 100 AS price_grivnas\nFROM products\nWHERE is_active = 1\nORDER BY price_cents\nLIMIT 5",
+      "final_sql": "SELECT product_id, name, price_cents / 100 AS price_grivnas\nFROM products\nWHERE is_active = 1\nORDER BY price_cents\nLIMIT 5",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "price_grivnas"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "product_id",
+          "name",
+          "price_grivnas"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "h23",
+      "question": "Покажи 5 заказов с наибольшей суммой товарных позиций (количество × цена позиции): номер заказа и сумму.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    o.order_id,\n    SUM(oi.quantity * oi.unit_price_cents) / 100 AS total_amount\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_amount DESC\nLIMIT 5;",
+      "final_sql": "SELECT \n    o.order_id,\n    SUM(oi.quantity * oi.unit_price_cents) / 100 AS total_amount\nFROM \n    orders o\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_amount DESC\nLIMIT 5;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "total_amount"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "order_id",
+          "total_amount"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "h24",
+      "question": "Покажи 5 самых дорогих успешных платежей: номер платежа, номер заказа и сумму.",
+      "category": "sorting",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    payment_id, \n    order_id, \n    amount_cents \nFROM \n    payments \nWHERE \n    status = 'successful' \nORDER BY \n    amount_cents DESC \nLIMIT 5;",
+      "final_sql": "SELECT \n    payment_id, \n    order_id, \n    amount_cents \nFROM \n    payments \nWHERE \n    status = 'successful' \nORDER BY \n    amount_cents DESC \nLIMIT 5;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "payment_id",
+          "order_id",
+          "amount_cents"
+        ],
+        "row_count": 5
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "payment_id",
+          "order_id",
+          "amount_cents"
+        ],
+        "row_count": 5
+      }
+    },
+    {
+      "test_id": "h25",
+      "question": "Сколько единиц товаров купили покупатели каждого города в доставленных заказах? Покажи город и количество.",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    c.city,\n    COUNT(o.order_id) AS total_units\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nWHERE \n    o.status = 'delivered' AND s.status = 'delivered'\nGROUP BY \n    c.city\nORDER BY \n    total_units DESC, c.city;",
+      "final_sql": "SELECT \n    c.city,\n    COUNT(o.order_id) AS total_units\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nJOIN \n    order_items oi ON o.order_id = oi.order_id\nWHERE \n    o.status = 'delivered' AND s.status = 'delivered'\nGROUP BY \n    c.city\nORDER BY \n    total_units DESC, c.city;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "city",
+          "total_units"
+        ],
+        "row_count": 8
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "city",
+          "total_units"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "h26",
+      "question": "Каков средний рейтинг товаров каждого поставщика? Покажи название поставщика и рейтинг, округлённый до двух знаков.",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        p.supplier_id,\n        AVG(r.rating) AS avg_rating\n    FROM\n        products p\n    JOIN\n        reviews r ON p.product_id = r.product_id\n    GROUP BY\n        p.supplier_id\n)\nSELECT\n    s.name AS supplier_name,\n    CAST(avg_ratings.avg_rating AS NUMERIC(10, 2)) AS rounded_avg_rating\nFROM\n    avg_ratings\nJOIN\n    suppliers s ON avg_ratings.supplier_id = s.supplier_id\nORDER BY\n    rounded_avg_rating DESC;",
+      "final_sql": "WITH avg_ratings AS (\n    SELECT\n        p.supplier_id,\n        AVG(r.rating) AS avg_rating\n    FROM\n        products p\n    JOIN\n        reviews r ON p.product_id = r.product_id\n    GROUP BY\n        p.supplier_id\n)\nSELECT\n    s.name AS supplier_name,\n    CAST(avg_ratings.avg_rating AS NUMERIC(10, 2)) AS rounded_avg_rating\nFROM\n    avg_ratings\nJOIN\n    suppliers s ON avg_ratings.supplier_id = s.supplier_id\nORDER BY\n    rounded_avg_rating DESC;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "supplier_name",
+          "rounded_avg_rating"
+        ],
+        "row_count": 12
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "supplier_name",
+          "rounded_avg_rating"
+        ],
+        "row_count": 12
+      }
+    },
+    {
+      "test_id": "h27",
+      "question": "Сколько разных покупателей купили товары каждой категории в доставленных заказах? Покажи название категории и число покупателей.",
+      "category": "multi_table_aggregation",
+      "mode": "baseline",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.order_id, c.customer_id, p.category_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT p.category_id, COUNT(DISTINCT c.customer_id) AS customer_count\nFROM delivered_orders do\nJOIN customers c ON do.customer_id = c.customer_id\nJOIN products p ON do.category_id = p.category_id\nGROUP BY p.category_id;",
+      "final_sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.order_id, o.customer_id, p.category_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT p.category_id, COUNT(DISTINCT do.customer_id) AS customer_count\nFROM delivered_orders do\nJOIN products p ON do.category_id = p.category_id\nGROUP BY p.category_id;",
+      "attempts": 3,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.order_id, c.customer_id, p.category_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT p.category_id, COUNT(DISTINCT c.customer_id) AS customer_count\nFROM delivered_orders do\nJOIN customers c ON do.customer_id = c.customer_id\nJOIN products p ON do.category_id = p.category_id\nGROUP BY p.category_id;",
+          "error": "OperationalError: no such column: c.customer_id",
+          "feedback": "Запрос не выполнился.\nСообщение SQLite: OperationalError: no such column: c.customer_id\nПроверь синтаксис, названия таблиц и столбцов и связи между таблицами."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.order_id, c.customer_id, p.category_id\n    FROM orders o\n    JOIN order_items oi ON o.order_id = oi.order_id\n    JOIN products p ON oi.product_id = p.product_id\n    WHERE o.status = 'delivered'\n)\nSELECT p.category_id, COUNT(DISTINCT do.customer_id) AS customer_count\nFROM delivered_orders do\nJOIN products p ON do.category_id = p.category_id\nGROUP BY p.category_id;",
+          "error": "OperationalError: no such column: c.customer_id",
+          "feedback": "Запрос не выполнился.\nСообщение SQLite: OperationalError: no such column: c.customer_id\nПроверь синтаксис, названия таблиц и столбцов и связи между таблицами."
+        }
+      ],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": false,
+        "error": "OperationalError: no such column: c.customer_id",
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [],
+        "row_count": 0
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": false,
+        "lenient": false,
+        "columns_match": false,
+        "columns": [
+          "category_id",
+          "customer_count"
+        ],
+        "row_count": 8
+      }
+    },
+    {
+      "test_id": "h28",
+      "question": "Сколько заказов было оформлено в первом квартале 2026 года?",
+      "category": "date_filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT COUNT(*) \nFROM orders \nWHERE ordered_at BETWEEN '2026-01-01' AND '2026-03-31'",
+      "final_sql": "SELECT COUNT(*) \nFROM orders \nWHERE ordered_at BETWEEN '2026-01-01' AND '2026-03-31'",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": false,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": false,
+        "columns": [
+          "COUNT(*)"
+        ],
+        "row_count": 1
+      }
+    },
+    {
+      "test_id": "h29",
+      "question": "Какие платежи были успешно проведены в июне 2025 года? Покажи номер платежа, номер заказа и сумму.",
+      "category": "date_filtering",
+      "mode": "baseline",
+      "initial_sql": "SELECT payment_id, order_id, amount_cents\nFROM payments\nWHERE status = 'successful' AND strftime('%Y-%m', paid_at) = '2025-06';",
+      "final_sql": "SELECT payment_id, order_id, amount_cents\nFROM payments\nWHERE status = 'successful' AND strftime('%Y-%m', paid_at) = '2025-06';",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "payment_id",
+          "order_id",
+          "amount_cents"
+        ],
+        "row_count": 13
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "payment_id",
+          "order_id",
+          "amount_cents"
+        ],
+        "row_count": 13
+      }
+    },
+    {
+      "test_id": "h30",
+      "question": "Сколько заказов оформлено в каждом месяце 2025 года? Покажи месяц в формате ГГГГ-ММ и количество.",
+      "category": "date_aggregation",
+      "mode": "baseline",
+      "initial_sql": "SELECT \n    strftime('%Y-%m', ordered_at) AS month,\n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2025-%'\nGROUP BY \n    month\nORDER BY \n    month;",
+      "final_sql": "SELECT \n    strftime('%Y-%m', ordered_at) AS month,\n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2025-%'\nGROUP BY \n    month\nORDER BY \n    month;",
+      "attempts": 1,
+      "correction_history": [],
+      "generation_error": null,
+      "stuck_on_same_sql": false,
+      "first_attempt": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "month",
+          "order_count"
+        ],
+        "row_count": 12
+      },
+      "final": {
+        "executed": true,
+        "error": null,
+        "strict": true,
+        "execution_match": true,
+        "lenient": true,
+        "columns_match": true,
+        "columns": [
+          "month",
+          "order_count"
+        ],
+        "row_count": 12
+      }
+    }
+  ]
+}

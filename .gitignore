@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+
+# Local runtime artifacts
+.tmp/
+logs/*
+!logs/.gitkeep
+
+# Partial evaluation runs
+reports/scratch/

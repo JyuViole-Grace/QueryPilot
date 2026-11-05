@@ -1,0 +1,5503 @@
+{
+  "project": "QueryPilot",
+  "role": "heldout",
+  "version": 4,
+  "database": "SQLite",
+  "language": "en",
+  "data_edition": "english",
+  "test_count": 100,
+  "database_sha256": "7196f7b5ca6fdc6958f0f09a486c34ba92424073285e069512cbd36dc189767a",
+  "created_with_prompt_sha256_prefix": null,
+  "independence_note": "Evaluation questions for a single clean run. Do not use this set for prompt, validator or repair tuning; if you do, retire it and write a new set.",
+  "authorship_note": "Written by an AI assistant (Claude) on 2026-11-03 after reviewing the failures of heldout_v3. Reference SQL and wrong-answer variants are validated mechanically by scripts/build_heldout_v4.py.",
+  "category_counts": {
+    "aggregation": 13,
+    "conditional_aggregation": 6,
+    "date_aggregation": 10,
+    "filtering": 9,
+    "joins": 14,
+    "multi_table_aggregation": 17,
+    "negation": 10,
+    "ranking": 4,
+    "sorting": 4,
+    "subqueries": 13
+  },
+  "tests": [
+    {
+      "id": "v4_001",
+      "question": "How many customers live in each city? Show the city and the number of customers, only for cities with more than 10 customers.",
+      "category": "aggregation",
+      "reference_sql": "SELECT city, COUNT(*) AS customer_count FROM customers GROUP BY city HAVING COUNT(*) > 10",
+      "expected_columns": [
+        "city",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "customer_count": 12
+        },
+        {
+          "city": "Dnipro",
+          "customer_count": 15
+        },
+        {
+          "city": "Kharkiv",
+          "customer_count": 16
+        },
+        {
+          "city": "Kyiv",
+          "customer_count": 14
+        },
+        {
+          "city": "Lviv",
+          "customer_count": 19
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT city, COUNT(*) AS customer_count FROM customers GROUP BY city"
+      ]
+    },
+    {
+      "id": "v4_002",
+      "question": "What is the average product price in cents for each category? Show the category name and the average price rounded to two decimals.",
+      "category": "aggregation",
+      "reference_sql": "SELECT c.name AS category_name, ROUND(AVG(p.price_cents), 2) AS avg_price_cents\n       FROM categories c JOIN products p ON p.category_id = c.category_id\n       GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "avg_price_cents"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "avg_price_cents": 143880.0
+        },
+        {
+          "category_name": "Smartphones",
+          "avg_price_cents": 133620.0
+        },
+        {
+          "category_name": "Monitors",
+          "avg_price_cents": 156050.0
+        },
+        {
+          "category_name": "Components",
+          "avg_price_cents": 150390.0
+        },
+        {
+          "category_name": "Peripherals",
+          "avg_price_cents": 89920.0
+        },
+        {
+          "category_name": "Audio",
+          "avg_price_cents": 118250.0
+        },
+        {
+          "category_name": "Networking Equipment",
+          "avg_price_cents": 184690.0
+        },
+        {
+          "category_name": "Accessories",
+          "avg_price_cents": 108370.0
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, ROUND(AVG(oi.unit_price_cents), 2) AS avg_price_cents\n              FROM categories c JOIN products p ON p.category_id = c.category_id\n              JOIN order_items oi ON oi.product_id = p.product_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_003",
+      "question": "How many orders were placed in each calendar year? Show the year as a four-digit text value and the number of orders.",
+      "category": "aggregation",
+      "reference_sql": "SELECT strftime('%Y', ordered_at) AS order_year, COUNT(*) AS order_count FROM orders GROUP BY strftime('%Y', ordered_at)",
+      "expected_columns": [
+        "order_year",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "order_year": "2025",
+          "order_count": 173
+        },
+        {
+          "order_year": "2026",
+          "order_count": 127
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y', o.ordered_at) AS order_year, COUNT(*) AS order_count FROM orders o\n              JOIN order_items oi ON oi.order_id = o.order_id GROUP BY strftime('%Y', o.ordered_at)"
+      ]
+    },
+    {
+      "id": "v4_004",
+      "question": "How many units were sold in total in orders with status 'delivered'? Count item quantities. Show a single value named units_sold.",
+      "category": "aggregation",
+      "reference_sql": "SELECT SUM(oi.quantity) AS units_sold FROM order_items oi\n       JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered'",
+      "expected_columns": [
+        "units_sold"
+      ],
+      "expected_result": [
+        {
+          "units_sold": 646
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT COUNT(*) AS units_sold FROM order_items oi\n              JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'delivered'"
+      ]
+    },
+    {
+      "id": "v4_005",
+      "question": "For each supplier country, how many products do the suppliers from that country provide? Show the country and the number of products.",
+      "category": "aggregation",
+      "reference_sql": "SELECT s.country, COUNT(p.product_id) AS product_count FROM suppliers s\n       JOIN products p ON p.supplier_id = s.supplier_id GROUP BY s.country",
+      "expected_columns": [
+        "country",
+        "product_count"
+      ],
+      "expected_result": [
+        {
+          "country": "Czechia",
+          "product_count": 13
+        },
+        {
+          "country": "Germany",
+          "product_count": 14
+        },
+        {
+          "country": "Poland",
+          "product_count": 20
+        },
+        {
+          "country": "Taiwan",
+          "product_count": 27
+        },
+        {
+          "country": "Ukraine",
+          "product_count": 6
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.country, COUNT(DISTINCT s.supplier_id) AS product_count FROM suppliers s\n              JOIN products p ON p.supplier_id = s.supplier_id GROUP BY s.country"
+      ]
+    },
+    {
+      "id": "v4_006",
+      "question": "What are the maximum and the minimum product price in cents within the category 'Audio'? Show max_price_cents and min_price_cents.",
+      "category": "aggregation",
+      "reference_sql": "SELECT MAX(p.price_cents) AS max_price_cents, MIN(p.price_cents) AS min_price_cents\n       FROM products p JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Audio'",
+      "expected_columns": [
+        "max_price_cents",
+        "min_price_cents"
+      ],
+      "expected_result": [
+        {
+          "max_price_cents": 225400,
+          "min_price_cents": 15500
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT MAX(price_cents) AS max_price_cents, MIN(price_cents) AS min_price_cents FROM products"
+      ]
+    },
+    {
+      "id": "v4_007",
+      "question": "How many different customers have placed at least one order? Show the number as customer_count.",
+      "category": "aggregation",
+      "reference_sql": "SELECT COUNT(DISTINCT customer_id) AS customer_count FROM orders",
+      "expected_columns": [
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "customer_count": 83
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT COUNT(*) AS customer_count FROM orders"
+      ]
+    },
+    {
+      "id": "v4_008",
+      "question": "What is the total amount in cents of all payments with status 'successful'? Show the value as total_successful_cents.",
+      "category": "aggregation",
+      "reference_sql": "SELECT SUM(amount_cents) AS total_successful_cents FROM payments WHERE status = 'successful'",
+      "expected_columns": [
+        "total_successful_cents"
+      ],
+      "expected_result": [
+        {
+          "total_successful_cents": 157531098
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT SUM(amount_cents) AS total_successful_cents FROM payments"
+      ]
+    },
+    {
+      "id": "v4_009",
+      "question": "Which carrier has handled the largest number of shipments in total? Show the carrier and its number of shipments.",
+      "category": "aggregation",
+      "reference_sql": "SELECT carrier, COUNT(*) AS shipment_count FROM shipments GROUP BY carrier ORDER BY shipment_count DESC LIMIT 1",
+      "expected_columns": [
+        "carrier",
+        "shipment_count"
+      ],
+      "expected_result": [
+        {
+          "carrier": "Meest",
+          "shipment_count": 90
+        }
+      ],
+      "order_key": [
+        "carrier"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT carrier, COUNT(*) AS shipment_count FROM shipments GROUP BY carrier ORDER BY shipment_count ASC LIMIT 1"
+      ]
+    },
+    {
+      "id": "v4_010",
+      "question": "What is the average review rating across all reviews, rounded to two decimals? Show the value as avg_rating.",
+      "category": "aggregation",
+      "reference_sql": "SELECT ROUND(AVG(rating), 2) AS avg_rating FROM reviews",
+      "expected_columns": [
+        "avg_rating"
+      ],
+      "expected_result": [
+        {
+          "avg_rating": 4.25
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT ROUND(AVG(product_avg), 2) AS avg_rating\n              FROM (SELECT AVG(rating) AS product_avg FROM reviews GROUP BY product_id)"
+      ]
+    },
+    {
+      "id": "v4_011",
+      "question": "How many reviews has each rating value received? Show the rating and the number of reviews.",
+      "category": "aggregation",
+      "reference_sql": "SELECT rating, COUNT(*) AS review_count FROM reviews GROUP BY rating",
+      "expected_columns": [
+        "rating",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "rating": 1,
+          "review_count": 6
+        },
+        {
+          "rating": 2,
+          "review_count": 4
+        },
+        {
+          "rating": 3,
+          "review_count": 24
+        },
+        {
+          "rating": 4,
+          "review_count": 65
+        },
+        {
+          "rating": 5,
+          "review_count": 101
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT rating, COUNT(DISTINCT product_id) AS review_count FROM reviews GROUP BY rating"
+      ]
+    },
+    {
+      "id": "v4_012",
+      "question": "What is the total discount in cents given on orders that used a coupon? Show the value as total_discount_cents.",
+      "category": "aggregation",
+      "reference_sql": "SELECT SUM(o.discount_cents) AS total_discount_cents FROM orders o\n       WHERE o.coupon_id IS NOT NULL",
+      "expected_columns": [
+        "total_discount_cents"
+      ],
+      "expected_result": [
+        {
+          "total_discount_cents": 2905026
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT SUM(o.discount_cents * c.discount_percent / 100) AS total_discount_cents\n              FROM orders o JOIN coupons c ON c.coupon_id = o.coupon_id"
+      ]
+    },
+    {
+      "id": "v4_013",
+      "question": "Which products are inactive? Show the product name and its price in cents.",
+      "category": "filtering",
+      "reference_sql": "SELECT name, price_cents FROM products WHERE is_active = 0",
+      "expected_columns": [
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "name": "Aero Air 13",
+          "price_cents": 126100
+        },
+        {
+          "name": "Nova Ultra 26",
+          "price_cents": 65400
+        },
+        {
+          "name": "Orbit Plus 39",
+          "price_cents": 174900
+        },
+        {
+          "name": "Zenith Plus 52",
+          "price_cents": 91600
+        },
+        {
+          "name": "Titan Elite 65",
+          "price_cents": 21800
+        },
+        {
+          "name": "Orbit X 78",
+          "price_cents": 103800
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, price_cents FROM products WHERE stock_quantity = 0"
+      ]
+    },
+    {
+      "id": "v4_014",
+      "question": "Which products in the category 'Monitors' cost more than 100000 cents? Show the product name and the price in cents.",
+      "category": "filtering",
+      "reference_sql": "SELECT p.name, p.price_cents FROM products p JOIN categories c ON c.category_id = p.category_id\n       WHERE c.name = 'Monitors' AND p.price_cents > 100000",
+      "expected_columns": [
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "name": "Orbit Plus 03",
+          "price_cents": 213600
+        },
+        {
+          "name": "Hyper Core 11",
+          "price_cents": 133500
+        },
+        {
+          "name": "Quantum Ultra 19",
+          "price_cents": 198800
+        },
+        {
+          "name": "Vertex Air 27",
+          "price_cents": 179100
+        },
+        {
+          "name": "Hyper Core 35",
+          "price_cents": 185100
+        },
+        {
+          "name": "Pulse Elite 43",
+          "price_cents": 149000
+        },
+        {
+          "name": "Zenith Ultra 67",
+          "price_cents": 177000
+        },
+        {
+          "name": "Vertex Plus 75",
+          "price_cents": 204700
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, price_cents FROM products WHERE price_cents > 100000"
+      ]
+    },
+    {
+      "id": "v4_015",
+      "question": "Which orders were placed in March 2026? Show the order IDs and their statuses.",
+      "category": "filtering",
+      "reference_sql": "SELECT order_id, status FROM orders WHERE ordered_at >= '2026-03-01' AND ordered_at < '2026-04-01'",
+      "expected_columns": [
+        "order_id",
+        "status"
+      ],
+      "expected_result": [
+        {
+          "order_id": 63,
+          "status": "delivered"
+        },
+        {
+          "order_id": 172,
+          "status": "delivered"
+        },
+        {
+          "order_id": 182,
+          "status": "delivered"
+        },
+        {
+          "order_id": 217,
+          "status": "processing"
+        },
+        {
+          "order_id": 269,
+          "status": "delivered"
+        },
+        {
+          "order_id": 93,
+          "status": "shipped"
+        },
+        {
+          "order_id": 171,
+          "status": "shipped"
+        },
+        {
+          "order_id": 272,
+          "status": "delivered"
+        },
+        {
+          "order_id": 274,
+          "status": "delivered"
+        },
+        {
+          "order_id": 53,
+          "status": "cancelled"
+        },
+        {
+          "order_id": 277,
+          "status": "cancelled"
+        },
+        {
+          "order_id": 206,
+          "status": "pending"
+        },
+        {
+          "order_id": 74,
+          "status": "cancelled"
+        },
+        {
+          "order_id": 266,
+          "status": "cancelled"
+        },
+        {
+          "order_id": 196,
+          "status": "shipped"
+        },
+        {
+          "order_id": 40,
+          "status": "delivered"
+        },
+        {
+          "order_id": 51,
+          "status": "delivered"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT order_id, status FROM orders WHERE strftime('%m', ordered_at) = '03'"
+      ]
+    },
+    {
+      "id": "v4_016",
+      "question": "Which customers registered in 2024 and live in 'Lviv' or 'Kyiv'? Show their IDs and full names.",
+      "category": "filtering",
+      "reference_sql": "SELECT customer_id, full_name FROM customers\n       WHERE registered_at >= '2024-01-01' AND registered_at < '2025-01-01' AND city IN ('Lviv', 'Kyiv')",
+      "expected_columns": [
+        "customer_id",
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "customer_id": 3,
+          "full_name": "Nikita Boiko"
+        },
+        {
+          "customer_id": 5,
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "customer_id": 10,
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "customer_id": 12,
+          "full_name": "Viktoria Polishchuk"
+        },
+        {
+          "customer_id": 16,
+          "full_name": "Maria Melnyk"
+        },
+        {
+          "customer_id": 31,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "customer_id": 33,
+          "full_name": "Maksym Boiko"
+        },
+        {
+          "customer_id": 37,
+          "full_name": "Ivan Tkachenko"
+        },
+        {
+          "customer_id": 39,
+          "full_name": "Sofia Tkachenko"
+        },
+        {
+          "customer_id": 43,
+          "full_name": "Viktoria Polishchuk"
+        },
+        {
+          "customer_id": 49,
+          "full_name": "Maria Kravchenko"
+        },
+        {
+          "customer_id": 52,
+          "full_name": "Oleksandr Kravchenko"
+        },
+        {
+          "customer_id": 57,
+          "full_name": "Artem Polishchuk"
+        },
+        {
+          "customer_id": 58,
+          "full_name": "Nikita Bondarenko"
+        },
+        {
+          "customer_id": 66,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "customer_id": 72,
+          "full_name": "Ivan Tkachenko"
+        },
+        {
+          "customer_id": 73,
+          "full_name": "Maria Tkachenko"
+        },
+        {
+          "customer_id": 75,
+          "full_name": "Daria Melnyk"
+        },
+        {
+          "customer_id": 79,
+          "full_name": "Sofia Bondarenko"
+        },
+        {
+          "customer_id": 84,
+          "full_name": "Viktoria Shevchenko"
+        },
+        {
+          "customer_id": 86,
+          "full_name": "Maksym Bondarenko"
+        },
+        {
+          "customer_id": 94,
+          "full_name": "Maria Tkachenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT customer_id, full_name FROM customers WHERE city IN ('Lviv', 'Kyiv')"
+      ]
+    },
+    {
+      "id": "v4_017",
+      "question": "Which coupons are marked as inactive? Show the coupon code and the discount percentage.",
+      "category": "filtering",
+      "reference_sql": "SELECT code, discount_percent FROM coupons WHERE is_active = 0",
+      "expected_columns": [
+        "code",
+        "discount_percent"
+      ],
+      "expected_result": [
+        {
+          "code": "SALE08",
+          "discount_percent": 10
+        },
+        {
+          "code": "SALE09",
+          "discount_percent": 10
+        },
+        {
+          "code": "SALE10",
+          "discount_percent": 5
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "v4_018",
+      "question": "Which products have between 30 and 35 units in stock, both limits included? Show the product name and the stock quantity.",
+      "category": "filtering",
+      "reference_sql": "SELECT name, stock_quantity FROM products WHERE stock_quantity BETWEEN 30 AND 35",
+      "expected_columns": [
+        "name",
+        "stock_quantity"
+      ],
+      "expected_result": [
+        {
+          "name": "Orbit Plus 01",
+          "stock_quantity": 35
+        },
+        {
+          "name": "Nova Pro 22",
+          "stock_quantity": 31
+        },
+        {
+          "name": "Zenith Elite 25",
+          "stock_quantity": 31
+        },
+        {
+          "name": "Zenith Max 34",
+          "stock_quantity": 35
+        },
+        {
+          "name": "Hyper Core 35",
+          "stock_quantity": 30
+        },
+        {
+          "name": "Pulse Elite 53",
+          "stock_quantity": 32
+        },
+        {
+          "name": "Nova Pro 56",
+          "stock_quantity": 31
+        },
+        {
+          "name": "Nova Air 57",
+          "stock_quantity": 30
+        },
+        {
+          "name": "Pulse Plus 71",
+          "stock_quantity": 31
+        },
+        {
+          "name": "Pulse X 72",
+          "stock_quantity": 31
+        },
+        {
+          "name": "Vertex Plus 75",
+          "stock_quantity": 33
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, stock_quantity FROM products WHERE stock_quantity > 30 AND stock_quantity < 35"
+      ]
+    },
+    {
+      "id": "v4_019",
+      "question": "Which payments with status 'failed' were for more than 500000 cents? Show the payment IDs and the amounts in cents.",
+      "category": "filtering",
+      "reference_sql": "SELECT payment_id, amount_cents FROM payments WHERE status = 'failed' AND amount_cents > 500000",
+      "expected_columns": [
+        "payment_id",
+        "amount_cents"
+      ],
+      "expected_result": [
+        {
+          "payment_id": 7,
+          "amount_cents": 742767
+        },
+        {
+          "payment_id": 26,
+          "amount_cents": 951522
+        },
+        {
+          "payment_id": 28,
+          "amount_cents": 659436
+        },
+        {
+          "payment_id": 51,
+          "amount_cents": 1341168
+        },
+        {
+          "payment_id": 66,
+          "amount_cents": 618005
+        },
+        {
+          "payment_id": 68,
+          "amount_cents": 715823
+        },
+        {
+          "payment_id": 69,
+          "amount_cents": 715823
+        },
+        {
+          "payment_id": 91,
+          "amount_cents": 1054140
+        },
+        {
+          "payment_id": 118,
+          "amount_cents": 1163352
+        },
+        {
+          "payment_id": 146,
+          "amount_cents": 946357
+        },
+        {
+          "payment_id": 151,
+          "amount_cents": 1093855
+        },
+        {
+          "payment_id": 188,
+          "amount_cents": 891196
+        },
+        {
+          "payment_id": 204,
+          "amount_cents": 794764
+        },
+        {
+          "payment_id": 214,
+          "amount_cents": 654449
+        },
+        {
+          "payment_id": 235,
+          "amount_cents": 500532
+        },
+        {
+          "payment_id": 240,
+          "amount_cents": 881308
+        },
+        {
+          "payment_id": 242,
+          "amount_cents": 786457
+        },
+        {
+          "payment_id": 254,
+          "amount_cents": 784140
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT payment_id, amount_cents FROM payments WHERE amount_cents > 500000"
+      ]
+    },
+    {
+      "id": "v4_020",
+      "question": "Which suppliers are located in 'Poland' or 'Germany'? Show the supplier name and the country.",
+      "category": "filtering",
+      "reference_sql": "SELECT name, country FROM suppliers WHERE country IN ('Poland', 'Germany')",
+      "expected_columns": [
+        "name",
+        "country"
+      ],
+      "expected_result": [
+        {
+          "name": "TechNova",
+          "country": "Poland"
+        },
+        {
+          "name": "NextWave",
+          "country": "Germany"
+        },
+        {
+          "name": "GlobalTech",
+          "country": "Poland"
+        },
+        {
+          "name": "NovaParts",
+          "country": "Germany"
+        },
+        {
+          "name": "DeviceWorld",
+          "country": "Poland"
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "v4_021",
+      "question": "Show the five most expensive products, sorted by price in descending order. Show the product name and the price in cents.",
+      "category": "sorting",
+      "reference_sql": "SELECT name, price_cents FROM products ORDER BY price_cents DESC, product_id LIMIT 5",
+      "expected_columns": [
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "name": "Pulse Plus 71",
+          "price_cents": 247600
+        },
+        {
+          "name": "Orbit X 42",
+          "price_cents": 240800
+        },
+        {
+          "name": "Pulse Elite 15",
+          "price_cents": 238100
+        },
+        {
+          "name": "Nova Ultra 49",
+          "price_cents": 236100
+        },
+        {
+          "name": "Nova Plus 55",
+          "price_cents": 225900
+        }
+      ],
+      "order_key": [
+        "name"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT name, price_cents FROM products ORDER BY price_cents ASC, product_id LIMIT 5"
+      ]
+    },
+    {
+      "id": "v4_022",
+      "question": "Show the three customers who registered first, sorted by registration date from the earliest. Show the full name and the registration date.",
+      "category": "sorting",
+      "reference_sql": "SELECT full_name, registered_at FROM customers ORDER BY registered_at, customer_id LIMIT 3",
+      "expected_columns": [
+        "full_name",
+        "registered_at"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Olena Moroz",
+          "registered_at": "2023-01-07"
+        },
+        {
+          "full_name": "Ivan Melnyk",
+          "registered_at": "2023-01-08"
+        },
+        {
+          "full_name": "Dmytro Tkachenko",
+          "registered_at": "2023-01-26"
+        }
+      ],
+      "order_key": [
+        "full_name"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT full_name, registered_at FROM customers ORDER BY registered_at DESC, customer_id LIMIT 3"
+      ]
+    },
+    {
+      "id": "v4_023",
+      "question": "Show the five orders with the largest discount in cents, sorted by the discount in descending order. Show the order ID and the discount in cents.",
+      "category": "sorting",
+      "reference_sql": "SELECT order_id, discount_cents FROM orders ORDER BY discount_cents DESC, order_id LIMIT 5",
+      "expected_columns": [
+        "order_id",
+        "discount_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 190,
+          "discount_cents": 302362
+        },
+        {
+          "order_id": 136,
+          "discount_cents": 172358
+        },
+        {
+          "order_id": 85,
+          "discount_cents": 146266
+        },
+        {
+          "order_id": 100,
+          "discount_cents": 139553
+        },
+        {
+          "order_id": 104,
+          "discount_cents": 138833
+        }
+      ],
+      "order_key": [
+        "order_id"
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "v4_024",
+      "question": "List all suppliers sorted alphabetically by name. Show only the supplier name.",
+      "category": "sorting",
+      "reference_sql": "SELECT name FROM suppliers ORDER BY name",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "ByteWorks"
+        },
+        {
+          "name": "DeviceWorld"
+        },
+        {
+          "name": "DigitalCore"
+        },
+        {
+          "name": "ElectroHub"
+        },
+        {
+          "name": "FutureGear"
+        },
+        {
+          "name": "GlobalTech"
+        },
+        {
+          "name": "MegaElectro"
+        },
+        {
+          "name": "NextWave"
+        },
+        {
+          "name": "NovaParts"
+        },
+        {
+          "name": "PrimeSystems"
+        },
+        {
+          "name": "SmartSupply"
+        },
+        {
+          "name": "TechNova"
+        }
+      ],
+      "order_key": [
+        "name"
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "v4_025",
+      "question": "Which products in the category 'Smartphones' have received at least one review with a rating of 5? Show each product name once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT p.name FROM products p\n       JOIN categories c ON c.category_id = p.category_id\n       JOIN reviews r ON r.product_id = p.product_id\n       WHERE c.name = 'Smartphones' AND r.rating = 5",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "Pulse Plus 02"
+        },
+        {
+          "name": "Hyper Plus 10"
+        },
+        {
+          "name": "Zenith Max 18"
+        },
+        {
+          "name": "Nova Ultra 26"
+        },
+        {
+          "name": "Zenith Max 34"
+        },
+        {
+          "name": "Orbit X 42"
+        },
+        {
+          "name": "Quantum X 50"
+        },
+        {
+          "name": "Zenith Ultra 58"
+        },
+        {
+          "name": "Hyper Plus 66"
+        },
+        {
+          "name": "Zenith Plus 74"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT p.name FROM products p\n              JOIN categories c ON c.category_id = p.category_id\n              JOIN reviews r ON r.product_id = p.product_id\n              WHERE c.name = 'Smartphones' AND r.rating = 5"
+      ]
+    },
+    {
+      "id": "v4_026",
+      "question": "Show the product name and the supplier name for every product that costs more than 220000 cents.",
+      "category": "joins",
+      "reference_sql": "SELECT p.name AS product_name, s.name AS supplier_name FROM products p\n       JOIN suppliers s ON s.supplier_id = p.supplier_id WHERE p.price_cents > 220000",
+      "expected_columns": [
+        "product_name",
+        "supplier_name"
+      ],
+      "expected_result": [
+        {
+          "product_name": "Pulse Elite 15",
+          "supplier_name": "NextWave"
+        },
+        {
+          "product_name": "Orbit X 42",
+          "supplier_name": "ByteWorks"
+        },
+        {
+          "product_name": "Aero Max 44",
+          "supplier_name": "NovaParts"
+        },
+        {
+          "product_name": "Nova Elite 48",
+          "supplier_name": "FutureGear"
+        },
+        {
+          "product_name": "Nova Ultra 49",
+          "supplier_name": "TechNova"
+        },
+        {
+          "product_name": "Nova Plus 55",
+          "supplier_name": "GlobalTech"
+        },
+        {
+          "product_name": "Zenith X 70",
+          "supplier_name": "PrimeSystems"
+        },
+        {
+          "product_name": "Pulse Plus 71",
+          "supplier_name": "MegaElectro"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT p.name AS product_name, s.name AS supplier_name FROM products p\n              JOIN suppliers s ON s.supplier_id = p.product_id WHERE p.price_cents > 220000"
+      ]
+    },
+    {
+      "id": "v4_027",
+      "question": "Which customers have written at least one review for a product in the category 'Laptops'? Show each customer's full name once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT cu.full_name FROM customers cu\n       JOIN reviews r ON r.customer_id = cu.customer_id\n       JOIN products p ON p.product_id = r.product_id\n       JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Laptops'",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Sofia Tkachenko"
+        },
+        {
+          "full_name": "Artem Shevchenko"
+        },
+        {
+          "full_name": "Maksym Bondarenko"
+        },
+        {
+          "full_name": "Maria Tkachenko"
+        },
+        {
+          "full_name": "Viktoria Melnyk"
+        },
+        {
+          "full_name": "Maria Kovalenko"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Anna Boiko"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Dmytro Kovalenko"
+        },
+        {
+          "full_name": "Anna Shevchenko"
+        },
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Viktoria Polishchuk"
+        },
+        {
+          "full_name": "Daria Boiko"
+        },
+        {
+          "full_name": "Sofia Oliinyk"
+        },
+        {
+          "full_name": "Nikita Bondarenko"
+        },
+        {
+          "full_name": "Oleksandr Kravchenko"
+        },
+        {
+          "full_name": "Sofia Kravchenko"
+        },
+        {
+          "full_name": "Viktoria Shevchenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.full_name FROM customers cu\n              JOIN reviews r ON r.customer_id = cu.customer_id\n              JOIN products p ON p.product_id = r.product_id\n              JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Laptops'"
+      ]
+    },
+    {
+      "id": "v4_028",
+      "question": "For orders with status 'returned', show the order ID, the customer's full name and the order date.",
+      "category": "joins",
+      "reference_sql": "SELECT o.order_id, cu.full_name, o.ordered_at FROM orders o\n       JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.status = 'returned'",
+      "expected_columns": [
+        "order_id",
+        "full_name",
+        "ordered_at"
+      ],
+      "expected_result": [
+        {
+          "order_id": 15,
+          "full_name": "Maksym Boiko",
+          "ordered_at": "2026-05-05"
+        },
+        {
+          "order_id": 18,
+          "full_name": "Sofia Moroz",
+          "ordered_at": "2025-05-02"
+        },
+        {
+          "order_id": 39,
+          "full_name": "Maria Oliinyk",
+          "ordered_at": "2025-10-03"
+        },
+        {
+          "order_id": 77,
+          "full_name": "Viktoria Shevchenko",
+          "ordered_at": "2025-03-18"
+        },
+        {
+          "order_id": 108,
+          "full_name": "Anna Melnyk",
+          "ordered_at": "2025-05-25"
+        },
+        {
+          "order_id": 124,
+          "full_name": "Maria Boiko",
+          "ordered_at": "2026-01-12"
+        },
+        {
+          "order_id": 128,
+          "full_name": "Anna Kravchenko",
+          "ordered_at": "2025-02-21"
+        },
+        {
+          "order_id": 129,
+          "full_name": "Artem Moroz",
+          "ordered_at": "2026-08-02"
+        },
+        {
+          "order_id": 139,
+          "full_name": "Anna Tkachenko",
+          "ordered_at": "2025-02-14"
+        },
+        {
+          "order_id": 141,
+          "full_name": "Maksym Tkachenko",
+          "ordered_at": "2025-03-04"
+        },
+        {
+          "order_id": 205,
+          "full_name": "Dmytro Tkachenko",
+          "ordered_at": "2025-03-28"
+        },
+        {
+          "order_id": 229,
+          "full_name": "Maria Melnyk",
+          "ordered_at": "2026-04-18"
+        },
+        {
+          "order_id": 283,
+          "full_name": "Artem Moroz",
+          "ordered_at": "2025-01-27"
+        },
+        {
+          "order_id": 286,
+          "full_name": "Artem Moroz",
+          "ordered_at": "2025-10-20"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT o.order_id, cu.full_name, o.ordered_at FROM orders o\n              JOIN customers cu ON cu.customer_id = o.customer_id WHERE o.status = 'cancelled'"
+      ]
+    },
+    {
+      "id": "v4_029",
+      "question": "Which orders have a payment with status 'refunded'? Show the order ID and the payment amount in cents.",
+      "category": "joins",
+      "reference_sql": "SELECT o.order_id, p.amount_cents FROM orders o JOIN payments p ON p.order_id = o.order_id\n       WHERE p.status = 'refunded'",
+      "expected_columns": [
+        "order_id",
+        "amount_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 15,
+          "amount_cents": 512254
+        },
+        {
+          "order_id": 18,
+          "amount_cents": 460225
+        },
+        {
+          "order_id": 39,
+          "amount_cents": 315582
+        },
+        {
+          "order_id": 77,
+          "amount_cents": 209208
+        },
+        {
+          "order_id": 108,
+          "amount_cents": 1724646
+        },
+        {
+          "order_id": 124,
+          "amount_cents": 385750
+        },
+        {
+          "order_id": 129,
+          "amount_cents": 720990
+        },
+        {
+          "order_id": 139,
+          "amount_cents": 755582
+        },
+        {
+          "order_id": 141,
+          "amount_cents": 873255
+        },
+        {
+          "order_id": 229,
+          "amount_cents": 549824
+        },
+        {
+          "order_id": 266,
+          "amount_cents": 80080
+        },
+        {
+          "order_id": 283,
+          "amount_cents": 1069452
+        },
+        {
+          "order_id": 286,
+          "amount_cents": 1005710
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT o.order_id, p.amount_cents FROM orders o JOIN payments p ON p.order_id = o.order_id\n              WHERE p.status = 'failed'"
+      ]
+    },
+    {
+      "id": "v4_030",
+      "question": "Show the shipment ID and the customer's full name for all delivered shipments handled by the carrier 'Nova Post'.",
+      "category": "joins",
+      "reference_sql": "SELECT s.shipment_id, cu.full_name FROM shipments s\n       JOIN orders o ON o.order_id = s.order_id\n       JOIN customers cu ON cu.customer_id = o.customer_id\n       WHERE s.carrier = 'Nova Post' AND s.status = 'delivered'",
+      "expected_columns": [
+        "shipment_id",
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "shipment_id": 11,
+          "full_name": "Maksym Boiko"
+        },
+        {
+          "shipment_id": 16,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "shipment_id": 27,
+          "full_name": "Sofia Oliinyk"
+        },
+        {
+          "shipment_id": 28,
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "shipment_id": 36,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "shipment_id": 45,
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "shipment_id": 49,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "shipment_id": 51,
+          "full_name": "Maria Boiko"
+        },
+        {
+          "shipment_id": 56,
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "shipment_id": 60,
+          "full_name": "Anna Shevchenko"
+        },
+        {
+          "shipment_id": 63,
+          "full_name": "Ivan Tkachenko"
+        },
+        {
+          "shipment_id": 67,
+          "full_name": "Oleksandr Bondarenko"
+        },
+        {
+          "shipment_id": 69,
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "shipment_id": 71,
+          "full_name": "Anna Moroz"
+        },
+        {
+          "shipment_id": 74,
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "shipment_id": 78,
+          "full_name": "Daria Kravchenko"
+        },
+        {
+          "shipment_id": 84,
+          "full_name": "Maria Boiko"
+        },
+        {
+          "shipment_id": 89,
+          "full_name": "Maksym Bondarenko"
+        },
+        {
+          "shipment_id": 92,
+          "full_name": "Nikita Kravchenko"
+        },
+        {
+          "shipment_id": 93,
+          "full_name": "Anna Tkachenko"
+        },
+        {
+          "shipment_id": 95,
+          "full_name": "Maksym Tkachenko"
+        },
+        {
+          "shipment_id": 96,
+          "full_name": "Oleksandr Kravchenko"
+        },
+        {
+          "shipment_id": 99,
+          "full_name": "Olena Melnyk"
+        },
+        {
+          "shipment_id": 103,
+          "full_name": "Viktoria Melnyk"
+        },
+        {
+          "shipment_id": 104,
+          "full_name": "Olena Bondarenko"
+        },
+        {
+          "shipment_id": 108,
+          "full_name": "Sofia Bondarenko"
+        },
+        {
+          "shipment_id": 110,
+          "full_name": "Maria Tkachenko"
+        },
+        {
+          "shipment_id": 120,
+          "full_name": "Oleksandr Bondarenko"
+        },
+        {
+          "shipment_id": 126,
+          "full_name": "Maria Kovalenko"
+        },
+        {
+          "shipment_id": 135,
+          "full_name": "Sofia Bondarenko"
+        },
+        {
+          "shipment_id": 139,
+          "full_name": "Artem Polishchuk"
+        },
+        {
+          "shipment_id": 145,
+          "full_name": "Viktoria Shevchenko"
+        },
+        {
+          "shipment_id": 149,
+          "full_name": "Maria Boiko"
+        },
+        {
+          "shipment_id": 156,
+          "full_name": "Olena Bondarenko"
+        },
+        {
+          "shipment_id": 163,
+          "full_name": "Artem Tkachenko"
+        },
+        {
+          "shipment_id": 186,
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "shipment_id": 187,
+          "full_name": "Dmytro Polishchuk"
+        },
+        {
+          "shipment_id": 199,
+          "full_name": "Dmytro Melnyk"
+        },
+        {
+          "shipment_id": 200,
+          "full_name": "Artem Shevchenko"
+        },
+        {
+          "shipment_id": 204,
+          "full_name": "Maksym Polishchuk"
+        },
+        {
+          "shipment_id": 205,
+          "full_name": "Anna Bondarenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.shipment_id, cu.full_name FROM shipments s\n              JOIN orders o ON o.order_id = s.order_id\n              JOIN customers cu ON cu.customer_id = o.customer_id WHERE s.carrier = 'Nova Post'"
+      ]
+    },
+    {
+      "id": "v4_031",
+      "question": "Which products appear in at least one order with status 'cancelled'? Show each product name once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT p.name FROM products p\n       JOIN order_items oi ON oi.product_id = p.product_id\n       JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'cancelled'",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "Hyper Elite 07"
+        },
+        {
+          "name": "Zenith Elite 25"
+        },
+        {
+          "name": "Pulse X 72"
+        },
+        {
+          "name": "Vector Elite 73"
+        },
+        {
+          "name": "Titan Elite 65"
+        },
+        {
+          "name": "Hyper Plus 66"
+        },
+        {
+          "name": "Aero Core 69"
+        },
+        {
+          "name": "Pulse Elite 43"
+        },
+        {
+          "name": "Orbit Plus 03"
+        },
+        {
+          "name": "Vertex Core 33"
+        },
+        {
+          "name": "Orbit Pro 40"
+        },
+        {
+          "name": "Pulse Elite 51"
+        },
+        {
+          "name": "Orbit Plus 39"
+        },
+        {
+          "name": "Pulse Plus 02"
+        },
+        {
+          "name": "Vertex Air 27"
+        },
+        {
+          "name": "Vector Elite 31"
+        },
+        {
+          "name": "Quantum Air 37"
+        },
+        {
+          "name": "Nova Ultra 05"
+        },
+        {
+          "name": "Zenith X 70"
+        },
+        {
+          "name": "Vector Plus 20"
+        },
+        {
+          "name": "Orbit Pro 41"
+        },
+        {
+          "name": "Quantum X 47"
+        },
+        {
+          "name": "Quantum X 50"
+        },
+        {
+          "name": "Hyper Core 11"
+        },
+        {
+          "name": "Quantum X 32"
+        },
+        {
+          "name": "Nova Max 09"
+        },
+        {
+          "name": "Pulse Elite 53"
+        },
+        {
+          "name": "Vector Ultra 64"
+        },
+        {
+          "name": "Pulse Elite 15"
+        },
+        {
+          "name": "Vector Ultra 23"
+        },
+        {
+          "name": "Zenith Ultra 67"
+        },
+        {
+          "name": "Quantum Ultra 19"
+        },
+        {
+          "name": "Nova Elite 48"
+        },
+        {
+          "name": "Zenith Max 18"
+        },
+        {
+          "name": "Nova Pro 22"
+        },
+        {
+          "name": "Nova Plus 55"
+        },
+        {
+          "name": "Vector Plus 17"
+        },
+        {
+          "name": "Pulse Pro 08"
+        },
+        {
+          "name": "Titan Plus 06"
+        },
+        {
+          "name": "Zenith Plus 52"
+        },
+        {
+          "name": "Titan Plus 36"
+        },
+        {
+          "name": "Quantum Ultra 60"
+        },
+        {
+          "name": "Zenith Pro 54"
+        },
+        {
+          "name": "Orbit Plus 46"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT p.name FROM products p\n              JOIN order_items oi ON oi.product_id = p.product_id\n              JOIN orders o ON o.order_id = oi.order_id WHERE o.status = 'returned'"
+      ]
+    },
+    {
+      "id": "v4_032",
+      "question": "Show the full name of every customer who placed at least one order with the coupon code 'SALE05'. Each customer once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT cu.full_name FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id\n       JOIN coupons c ON c.coupon_id = o.coupon_id WHERE c.code = 'SALE05'",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "full_name": "Maksym Polishchuk"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT cu.full_name FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id\n              JOIN coupons c ON c.coupon_id = o.coupon_id WHERE c.code = 'SALE06'"
+      ]
+    },
+    {
+      "id": "v4_033",
+      "question": "Which suppliers provide at least one inactive product? Show each supplier name once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT s.name FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id\n       WHERE p.is_active = 0",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "TechNova"
+        },
+        {
+          "name": "DigitalCore"
+        },
+        {
+          "name": "NextWave"
+        },
+        {
+          "name": "ElectroHub"
+        },
+        {
+          "name": "SmartSupply"
+        },
+        {
+          "name": "ByteWorks"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT s.name FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id\n              WHERE p.is_active = 1"
+      ]
+    },
+    {
+      "id": "v4_034",
+      "question": "For each customer living in 'Vinnytsia', show the full name and the number of reviews they have written. Include customers with no reviews, with a count of 0.",
+      "category": "joins",
+      "reference_sql": "SELECT cu.full_name, COUNT(r.review_id) AS review_count FROM customers cu\n       LEFT JOIN reviews r ON r.customer_id = cu.customer_id\n       WHERE cu.city = 'Vinnytsia' GROUP BY cu.customer_id, cu.full_name",
+      "expected_columns": [
+        "full_name",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Dmytro Oliinyk",
+          "review_count": 1
+        },
+        {
+          "full_name": "Dmytro Melnyk",
+          "review_count": 2
+        },
+        {
+          "full_name": "Maksym Polishchuk",
+          "review_count": 3
+        },
+        {
+          "full_name": "Anna Moroz",
+          "review_count": 2
+        },
+        {
+          "full_name": "Maria Oliinyk",
+          "review_count": 2
+        },
+        {
+          "full_name": "Maria Oliinyk",
+          "review_count": 0
+        },
+        {
+          "full_name": "Oleksandr Kovalenko",
+          "review_count": 0
+        },
+        {
+          "full_name": "Anna Bondarenko",
+          "review_count": 1
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.full_name, COUNT(r.review_id) AS review_count FROM customers cu\n              JOIN reviews r ON r.customer_id = cu.customer_id\n              WHERE cu.city = 'Vinnytsia' GROUP BY cu.customer_id, cu.full_name",
+        "SELECT cu.full_name, COUNT(*) AS review_count FROM customers cu\n              LEFT JOIN reviews r ON r.customer_id = cu.customer_id\n              WHERE cu.city = 'Vinnytsia' GROUP BY cu.customer_id, cu.full_name"
+      ]
+    },
+    {
+      "id": "v4_035",
+      "question": "For each category, show the category name and the number of its products that have never been ordered. Include categories where this number is 0.",
+      "category": "joins",
+      "reference_sql": "SELECT c.name AS category_name, COUNT(p.product_id) AS never_ordered_products FROM categories c\n       LEFT JOIN products p ON p.category_id = c.category_id\n            AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.product_id)\n       GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "never_ordered_products"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Smartphones",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Monitors",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Components",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Peripherals",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Audio",
+          "never_ordered_products": 0
+        },
+        {
+          "category_name": "Networking Equipment",
+          "never_ordered_products": 1
+        },
+        {
+          "category_name": "Accessories",
+          "never_ordered_products": 1
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(p.product_id) AS never_ordered_products FROM categories c\n              JOIN products p ON p.category_id = c.category_id\n              WHERE NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.product_id)\n              GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_036",
+      "question": "Which orders have more than one payment record? Show the order ID and the total of all its payments in cents.",
+      "category": "joins",
+      "reference_sql": "SELECT order_id, SUM(amount_cents) AS total_paid_cents FROM payments\n       GROUP BY order_id HAVING COUNT(*) > 1",
+      "expected_columns": [
+        "order_id",
+        "total_paid_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 29,
+          "total_paid_cents": 1318872
+        },
+        {
+          "order_id": 54,
+          "total_paid_cents": 2682336
+        },
+        {
+          "order_id": 73,
+          "total_paid_cents": 1431646
+        },
+        {
+          "order_id": 127,
+          "total_paid_cents": 382954
+        },
+        {
+          "order_id": 232,
+          "total_paid_cents": 1308898
+        },
+        {
+          "order_id": 254,
+          "total_paid_cents": 1001064
+        },
+        {
+          "order_id": 258,
+          "total_paid_cents": 1762616
+        },
+        {
+          "order_id": 259,
+          "total_paid_cents": 1572914
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT order_id, SUM(amount_cents) AS total_paid_cents FROM payments GROUP BY order_id"
+      ]
+    },
+    {
+      "id": "v4_037",
+      "question": "Which customers placed at least one order that used a coupon with a 20 percent discount? Show each customer's full name once.",
+      "category": "joins",
+      "reference_sql": "SELECT DISTINCT cu.full_name FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id\n       JOIN coupons c ON c.coupon_id = o.coupon_id WHERE c.discount_percent = 20",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Maria Kovalenko"
+        },
+        {
+          "full_name": "Daria Boiko"
+        },
+        {
+          "full_name": "Anna Boiko"
+        },
+        {
+          "full_name": "Anna Shevchenko"
+        },
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Nikita Boiko"
+        },
+        {
+          "full_name": "Dmytro Shevchenko"
+        },
+        {
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "full_name": "Maksym Polishchuk"
+        },
+        {
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "full_name": "Dmytro Polishchuk"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT cu.full_name FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id\n              JOIN coupons c ON c.coupon_id = o.coupon_id WHERE c.discount_percent = 10"
+      ]
+    },
+    {
+      "id": "v4_038",
+      "question": "Which products cost more than the average price of the products from the same supplier? Show the product name and the price in cents.",
+      "category": "subqueries",
+      "reference_sql": "SELECT p.name, p.price_cents FROM products p\n       WHERE p.price_cents > (SELECT AVG(p2.price_cents) FROM products p2 WHERE p2.supplier_id = p.supplier_id)",
+      "expected_columns": [
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "name": "Orbit Plus 03",
+          "price_cents": 213600
+        },
+        {
+          "name": "Nova Ultra 05",
+          "price_cents": 113700
+        },
+        {
+          "name": "Titan Plus 06",
+          "price_cents": 182900
+        },
+        {
+          "name": "Hyper Elite 07",
+          "price_cents": 214400
+        },
+        {
+          "name": "Nova Max 09",
+          "price_cents": 183600
+        },
+        {
+          "name": "Hyper Plus 10",
+          "price_cents": 181600
+        },
+        {
+          "name": "Orbit Air 14",
+          "price_cents": 177200
+        },
+        {
+          "name": "Pulse Elite 15",
+          "price_cents": 238100
+        },
+        {
+          "name": "Vector Plus 17",
+          "price_cents": 181000
+        },
+        {
+          "name": "Zenith Max 18",
+          "price_cents": 185900
+        },
+        {
+          "name": "Quantum Ultra 19",
+          "price_cents": 198800
+        },
+        {
+          "name": "Vector Plus 20",
+          "price_cents": 216100
+        },
+        {
+          "name": "Vector Ultra 23",
+          "price_cents": 199600
+        },
+        {
+          "name": "Vector Max 24",
+          "price_cents": 174700
+        },
+        {
+          "name": "Zenith Elite 25",
+          "price_cents": 162200
+        },
+        {
+          "name": "Vertex Air 27",
+          "price_cents": 179100
+        },
+        {
+          "name": "Zenith Pro 28",
+          "price_cents": 217100
+        },
+        {
+          "name": "Aero Plus 30",
+          "price_cents": 195300
+        },
+        {
+          "name": "Vector Elite 31",
+          "price_cents": 186200
+        },
+        {
+          "name": "Quantum X 32",
+          "price_cents": 187600
+        },
+        {
+          "name": "Vertex Core 33",
+          "price_cents": 111100
+        },
+        {
+          "name": "Zenith Max 34",
+          "price_cents": 218500
+        },
+        {
+          "name": "Hyper Core 35",
+          "price_cents": 185100
+        },
+        {
+          "name": "Quantum Max 38",
+          "price_cents": 161800
+        },
+        {
+          "name": "Orbit Plus 39",
+          "price_cents": 174900
+        },
+        {
+          "name": "Orbit Pro 40",
+          "price_cents": 195800
+        },
+        {
+          "name": "Orbit Pro 41",
+          "price_cents": 177000
+        },
+        {
+          "name": "Orbit X 42",
+          "price_cents": 240800
+        },
+        {
+          "name": "Aero Max 44",
+          "price_cents": 225400
+        },
+        {
+          "name": "Nova Elite 48",
+          "price_cents": 223700
+        },
+        {
+          "name": "Nova Ultra 49",
+          "price_cents": 236100
+        },
+        {
+          "name": "Quantum X 50",
+          "price_cents": 180500
+        },
+        {
+          "name": "Pulse Elite 53",
+          "price_cents": 160200
+        },
+        {
+          "name": "Nova Plus 55",
+          "price_cents": 225900
+        },
+        {
+          "name": "Quantum Ultra 60",
+          "price_cents": 156000
+        },
+        {
+          "name": "Vector Ultra 64",
+          "price_cents": 128500
+        },
+        {
+          "name": "Zenith Air 68",
+          "price_cents": 153300
+        },
+        {
+          "name": "Zenith X 70",
+          "price_cents": 225400
+        },
+        {
+          "name": "Pulse Plus 71",
+          "price_cents": 247600
+        },
+        {
+          "name": "Vector Elite 73",
+          "price_cents": 195300
+        },
+        {
+          "name": "Vertex Plus 75",
+          "price_cents": 204700
+        },
+        {
+          "name": "Pulse Core 76",
+          "price_cents": 144400
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, price_cents FROM products WHERE price_cents > (SELECT AVG(price_cents) FROM products)"
+      ]
+    },
+    {
+      "id": "v4_039",
+      "question": "Which products have more units in stock than the average stock quantity of the products in their own category? Show the product name and the stock quantity.",
+      "category": "subqueries",
+      "reference_sql": "SELECT p.name, p.stock_quantity FROM products p\n       WHERE p.stock_quantity > (SELECT AVG(p2.stock_quantity) FROM products p2 WHERE p2.category_id = p.category_id)",
+      "expected_columns": [
+        "name",
+        "stock_quantity"
+      ],
+      "expected_result": [
+        {
+          "name": "Pulse Plus 02",
+          "stock_quantity": 82
+        },
+        {
+          "name": "Pulse Air 04",
+          "stock_quantity": 74
+        },
+        {
+          "name": "Nova Ultra 05",
+          "stock_quantity": 76
+        },
+        {
+          "name": "Hyper Elite 07",
+          "stock_quantity": 73
+        },
+        {
+          "name": "Pulse Pro 08",
+          "stock_quantity": 90
+        },
+        {
+          "name": "Hyper Plus 10",
+          "stock_quantity": 79
+        },
+        {
+          "name": "Hyper Core 11",
+          "stock_quantity": 64
+        },
+        {
+          "name": "Orbit Air 14",
+          "stock_quantity": 78
+        },
+        {
+          "name": "Pulse Elite 15",
+          "stock_quantity": 70
+        },
+        {
+          "name": "Zenith Max 18",
+          "stock_quantity": 65
+        },
+        {
+          "name": "Vector Ultra 23",
+          "stock_quantity": 58
+        },
+        {
+          "name": "Vector Max 24",
+          "stock_quantity": 91
+        },
+        {
+          "name": "Nova Ultra 26",
+          "stock_quantity": 99
+        },
+        {
+          "name": "Vertex Air 27",
+          "stock_quantity": 89
+        },
+        {
+          "name": "Zenith Pro 28",
+          "stock_quantity": 71
+        },
+        {
+          "name": "Aero Plus 30",
+          "stock_quantity": 96
+        },
+        {
+          "name": "Vector Elite 31",
+          "stock_quantity": 70
+        },
+        {
+          "name": "Quantum X 32",
+          "stock_quantity": 57
+        },
+        {
+          "name": "Vertex Core 33",
+          "stock_quantity": 98
+        },
+        {
+          "name": "Titan Plus 36",
+          "stock_quantity": 69
+        },
+        {
+          "name": "Orbit Plus 39",
+          "stock_quantity": 69
+        },
+        {
+          "name": "Orbit Pro 41",
+          "stock_quantity": 97
+        },
+        {
+          "name": "Pulse Elite 43",
+          "stock_quantity": 53
+        },
+        {
+          "name": "Aero Max 44",
+          "stock_quantity": 62
+        },
+        {
+          "name": "Pulse Elite 45",
+          "stock_quantity": 62
+        },
+        {
+          "name": "Orbit Plus 46",
+          "stock_quantity": 85
+        },
+        {
+          "name": "Nova Elite 48",
+          "stock_quantity": 75
+        },
+        {
+          "name": "Nova Ultra 49",
+          "stock_quantity": 82
+        },
+        {
+          "name": "Zenith Pro 54",
+          "stock_quantity": 95
+        },
+        {
+          "name": "Zenith Ultra 58",
+          "stock_quantity": 72
+        },
+        {
+          "name": "Zenith Core 59",
+          "stock_quantity": 98
+        },
+        {
+          "name": "Quantum Ultra 60",
+          "stock_quantity": 99
+        },
+        {
+          "name": "Pulse Ultra 61",
+          "stock_quantity": 74
+        },
+        {
+          "name": "Vector Ultra 64",
+          "stock_quantity": 72
+        },
+        {
+          "name": "Titan Elite 65",
+          "stock_quantity": 84
+        },
+        {
+          "name": "Zenith Ultra 67",
+          "stock_quantity": 55
+        },
+        {
+          "name": "Aero Core 69",
+          "stock_quantity": 78
+        },
+        {
+          "name": "Pulse Core 76",
+          "stock_quantity": 71
+        },
+        {
+          "name": "Orbit X 78",
+          "stock_quantity": 71
+        },
+        {
+          "name": "Zenith X 79",
+          "stock_quantity": 57
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, stock_quantity FROM products WHERE stock_quantity > (SELECT AVG(stock_quantity) FROM products)"
+      ]
+    },
+    {
+      "id": "v4_040",
+      "question": "Which customers have placed at least one order that ended with status 'returned'? Show each customer's full name once.",
+      "category": "subqueries",
+      "reference_sql": "SELECT full_name FROM customers\n       WHERE customer_id IN (SELECT customer_id FROM orders WHERE status = 'returned')",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Sofia Moroz"
+        },
+        {
+          "full_name": "Maria Boiko"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Anna Tkachenko"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Maksym Boiko"
+        },
+        {
+          "full_name": "Dmytro Tkachenko"
+        },
+        {
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "full_name": "Maria Melnyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Anna Kravchenko"
+        },
+        {
+          "full_name": "Maksym Tkachenko"
+        },
+        {
+          "full_name": "Viktoria Shevchenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT full_name FROM customers\n              WHERE customer_id IN (SELECT customer_id FROM orders WHERE status = 'cancelled')"
+      ]
+    },
+    {
+      "id": "v4_041",
+      "question": "For each category, show the product with the maximum price: the category name, the product name and the price in cents.",
+      "category": "subqueries",
+      "reference_sql": "SELECT c.name AS category_name, p.name AS product_name, p.price_cents FROM products p\n       JOIN categories c ON c.category_id = p.category_id\n       WHERE p.price_cents = (SELECT MAX(p2.price_cents) FROM products p2 WHERE p2.category_id = p.category_id)",
+      "expected_columns": [
+        "category_name",
+        "product_name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Monitors",
+          "product_name": "Orbit Plus 03",
+          "price_cents": 213600
+        },
+        {
+          "category_name": "Smartphones",
+          "product_name": "Orbit X 42",
+          "price_cents": 240800
+        },
+        {
+          "category_name": "Components",
+          "product_name": "Aero Max 44",
+          "price_cents": 225400
+        },
+        {
+          "category_name": "Accessories",
+          "product_name": "Nova Elite 48",
+          "price_cents": 223700
+        },
+        {
+          "category_name": "Laptops",
+          "product_name": "Nova Ultra 49",
+          "price_cents": 236100
+        },
+        {
+          "category_name": "Peripherals",
+          "product_name": "Pulse Elite 53",
+          "price_cents": 160200
+        },
+        {
+          "category_name": "Audio",
+          "product_name": "Zenith X 70",
+          "price_cents": 225400
+        },
+        {
+          "category_name": "Networking Equipment",
+          "product_name": "Pulse Plus 71",
+          "price_cents": 247600
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, p.name AS product_name, p.price_cents FROM products p\n              JOIN categories c ON c.category_id = p.category_id\n              WHERE p.price_cents = (SELECT MAX(price_cents) FROM products)"
+      ]
+    },
+    {
+      "id": "v4_042",
+      "question": "Which categories have an average product price above the average price of all products? Show the category name.",
+      "category": "subqueries",
+      "reference_sql": "SELECT c.name FROM categories c JOIN products p ON p.category_id = c.category_id\n       GROUP BY c.category_id, c.name\n       HAVING AVG(p.price_cents) > (SELECT AVG(price_cents) FROM products)",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "Laptops"
+        },
+        {
+          "name": "Monitors"
+        },
+        {
+          "name": "Components"
+        },
+        {
+          "name": "Networking Equipment"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name FROM categories c JOIN products p ON p.category_id = c.category_id\n              GROUP BY c.category_id, c.name\n              HAVING AVG(p.price_cents) > (SELECT MAX(price_cents) / 2 FROM products)"
+      ]
+    },
+    {
+      "id": "v4_043",
+      "question": "Which suppliers provide more products than the average number of products per supplier? Show the supplier name and its number of products.",
+      "category": "subqueries",
+      "reference_sql": "SELECT s.name, COUNT(*) AS product_count FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id\n       GROUP BY s.supplier_id, s.name\n       HAVING COUNT(*) > (SELECT 1.0 * COUNT(*) / COUNT(DISTINCT supplier_id) FROM products)",
+      "expected_columns": [
+        "name",
+        "product_count"
+      ],
+      "expected_result": [
+        {
+          "name": "ByteWorks",
+          "product_count": 7
+        },
+        {
+          "name": "DigitalCore",
+          "product_count": 7
+        },
+        {
+          "name": "ElectroHub",
+          "product_count": 7
+        },
+        {
+          "name": "GlobalTech",
+          "product_count": 7
+        },
+        {
+          "name": "NextWave",
+          "product_count": 7
+        },
+        {
+          "name": "NovaParts",
+          "product_count": 7
+        },
+        {
+          "name": "SmartSupply",
+          "product_count": 7
+        },
+        {
+          "name": "TechNova",
+          "product_count": 7
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.name, COUNT(*) AS product_count FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id\n              GROUP BY s.supplier_id, s.name HAVING COUNT(*) >= 6"
+      ]
+    },
+    {
+      "id": "v4_044",
+      "question": "Which orders with status 'returned' consist of exactly four order item rows? Show the order ID.",
+      "category": "subqueries",
+      "reference_sql": "SELECT order_id FROM orders WHERE status = 'returned'\n       AND order_id IN (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(*) = 4)",
+      "expected_columns": [
+        "order_id"
+      ],
+      "expected_result": [
+        {
+          "order_id": 15
+        },
+        {
+          "order_id": 108
+        },
+        {
+          "order_id": 139
+        },
+        {
+          "order_id": 286
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT order_id FROM orders WHERE status = 'returned'\n              AND order_id IN (SELECT order_id FROM order_items GROUP BY order_id HAVING COUNT(*) >= 3)"
+      ]
+    },
+    {
+      "id": "v4_045",
+      "question": "Which customers have an average review rating above the average rating of all reviews? Show the customer's full name and their average rating rounded to two decimals.",
+      "category": "subqueries",
+      "reference_sql": "SELECT cu.full_name, ROUND(AVG(r.rating), 2) AS avg_rating FROM customers cu\n       JOIN reviews r ON r.customer_id = cu.customer_id GROUP BY cu.customer_id, cu.full_name\n       HAVING AVG(r.rating) > (SELECT AVG(rating) FROM reviews)",
+      "expected_columns": [
+        "full_name",
+        "avg_rating"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Anna Melnyk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Nikita Boiko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Artem Kovalenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Anna Melnyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Dmytro Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Dmytro Melnyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Maria Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Sofia Moroz",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Viktoria Polishchuk",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Maria Boiko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Daria Kravchenko",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Maksym Polishchuk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Sofia Kravchenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Artem Shevchenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Sofia Kovalenko",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Sofia Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Anna Moroz",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Nikita Polishchuk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Anna Boiko",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Anna Tkachenko",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Dmytro Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Maksym Boiko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Dmytro Polishchuk",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Maksym Boiko",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Sofia Polishchuk",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Sofia Shevchenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Anna Moroz",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Viktoria Polishchuk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Dmytro Shevchenko",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Ivan Melnyk",
+          "avg_rating": 4.67
+        },
+        {
+          "full_name": "Olena Bondarenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Ivan Melnyk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Maria Kovalenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Ivan Tkachenko",
+          "avg_rating": 4.33
+        },
+        {
+          "full_name": "Olena Oliinyk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Maria Oliinyk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Viktoria Kravchenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Artem Tkachenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Olena Melnyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Dmytro Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Viktoria Boiko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Anna Shevchenko",
+          "avg_rating": 4.67
+        },
+        {
+          "full_name": "Ivan Tkachenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Maria Melnyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Sofia Bondarenko",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Ivan Melnyk",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Maksym Tkachenko",
+          "avg_rating": 4.67
+        },
+        {
+          "full_name": "Ivan Shevchenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Maksym Bondarenko",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Ivan Oliinyk",
+          "avg_rating": 5.0
+        },
+        {
+          "full_name": "Daria Boiko",
+          "avg_rating": 4.5
+        },
+        {
+          "full_name": "Dmytro Kovalenko",
+          "avg_rating": 4.67
+        },
+        {
+          "full_name": "Dmytro Tkachenko",
+          "avg_rating": 5.0
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.full_name, ROUND(AVG(r.rating), 2) AS avg_rating FROM customers cu\n              JOIN reviews r ON r.customer_id = cu.customer_id GROUP BY cu.customer_id, cu.full_name\n              HAVING AVG(r.rating) >= 4"
+      ]
+    },
+    {
+      "id": "v4_046",
+      "question": "What is the average number of products per supplier, rounded to two decimals? Show the value as avg_products_per_supplier.",
+      "category": "subqueries",
+      "reference_sql": "SELECT ROUND(AVG(cnt), 2) AS avg_products_per_supplier\n       FROM (SELECT COUNT(*) AS cnt FROM products GROUP BY supplier_id)",
+      "expected_columns": [
+        "avg_products_per_supplier"
+      ],
+      "expected_result": [
+        {
+          "avg_products_per_supplier": 6.67
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT ROUND(1.0 * COUNT(*) / COUNT(DISTINCT category_id), 2) AS avg_products_per_supplier FROM products"
+      ]
+    },
+    {
+      "id": "v4_047",
+      "question": "What is the largest number of orders placed by a single customer? Show the value as max_orders.",
+      "category": "subqueries",
+      "reference_sql": "SELECT MAX(cnt) AS max_orders FROM (SELECT COUNT(*) AS cnt FROM orders GROUP BY customer_id)",
+      "expected_columns": [
+        "max_orders"
+      ],
+      "expected_result": [
+        {
+          "max_orders": 7
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT COUNT(*) AS max_orders FROM orders"
+      ]
+    },
+    {
+      "id": "v4_048",
+      "question": "Which products cost more than every product in the category 'Accessories'? Show the product name and the price in cents.",
+      "category": "subqueries",
+      "reference_sql": "SELECT name, price_cents FROM products\n       WHERE price_cents > (SELECT MAX(p.price_cents) FROM products p\n                            JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Accessories')",
+      "expected_columns": [
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "name": "Pulse Elite 15",
+          "price_cents": 238100
+        },
+        {
+          "name": "Orbit X 42",
+          "price_cents": 240800
+        },
+        {
+          "name": "Aero Max 44",
+          "price_cents": 225400
+        },
+        {
+          "name": "Nova Ultra 49",
+          "price_cents": 236100
+        },
+        {
+          "name": "Nova Plus 55",
+          "price_cents": 225900
+        },
+        {
+          "name": "Zenith X 70",
+          "price_cents": 225400
+        },
+        {
+          "name": "Pulse Plus 71",
+          "price_cents": 247600
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name, price_cents FROM products\n              WHERE price_cents > (SELECT MIN(p.price_cents) FROM products p\n                                   JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Accessories')"
+      ]
+    },
+    {
+      "id": "v4_049",
+      "question": "Which customers have placed orders only in 2026, with no order dated before 2026? Show the customer's full name.",
+      "category": "subqueries",
+      "reference_sql": "SELECT cu.full_name FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id\n       GROUP BY cu.customer_id, cu.full_name HAVING MIN(o.ordered_at) >= '2026-01-01'",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Olena Moroz"
+        },
+        {
+          "full_name": "Daria Kravchenko"
+        },
+        {
+          "full_name": "Sofia Kravchenko"
+        },
+        {
+          "full_name": "Sofia Oliinyk"
+        },
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Viktoria Bondarenko"
+        },
+        {
+          "full_name": "Sofia Shevchenko"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT cu.full_name FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id\n              WHERE o.ordered_at >= '2026-01-01'"
+      ]
+    },
+    {
+      "id": "v4_050",
+      "question": "Which products have an average review rating higher than the average review rating of their own category? Show the product name and its average rating rounded to two decimals.",
+      "category": "subqueries",
+      "reference_sql": "SELECT p.name, ROUND(AVG(r.rating), 2) AS avg_rating FROM products p\n       JOIN reviews r ON r.product_id = p.product_id GROUP BY p.product_id, p.name\n       HAVING AVG(r.rating) > (SELECT AVG(r2.rating) FROM reviews r2\n                               JOIN products p2 ON p2.product_id = r2.product_id\n                               WHERE p2.category_id = p.category_id)",
+      "expected_columns": [
+        "name",
+        "avg_rating"
+      ],
+      "expected_result": [
+        {
+          "name": "Nova Ultra 05",
+          "avg_rating": 4.33
+        },
+        {
+          "name": "Titan Plus 06",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Hyper Elite 07",
+          "avg_rating": 4.5
+        },
+        {
+          "name": "Nova Max 09",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Hyper Plus 10",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Aero Air 13",
+          "avg_rating": 4.0
+        },
+        {
+          "name": "Orbit Air 14",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Pulse Core 16",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Quantum Ultra 19",
+          "avg_rating": 4.5
+        },
+        {
+          "name": "Pulse Max 21",
+          "avg_rating": 4.33
+        },
+        {
+          "name": "Vector Ultra 23",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Nova Ultra 26",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Vector Elite 31",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Zenith Max 34",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Orbit Pro 40",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Orbit X 42",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Pulse Elite 45",
+          "avg_rating": 4.6
+        },
+        {
+          "name": "Orbit Plus 46",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Quantum X 47",
+          "avg_rating": 4.67
+        },
+        {
+          "name": "Nova Ultra 49",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Quantum X 50",
+          "avg_rating": 4.5
+        },
+        {
+          "name": "Zenith Plus 52",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Pulse Elite 53",
+          "avg_rating": 4.0
+        },
+        {
+          "name": "Nova Plus 55",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Nova Pro 56",
+          "avg_rating": 4.33
+        },
+        {
+          "name": "Nova Air 57",
+          "avg_rating": 4.5
+        },
+        {
+          "name": "Zenith Ultra 58",
+          "avg_rating": 4.5
+        },
+        {
+          "name": "Zenith Core 59",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Quantum Ultra 60",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Pulse Ultra 61",
+          "avg_rating": 4.0
+        },
+        {
+          "name": "Titan Elite 65",
+          "avg_rating": 4.33
+        },
+        {
+          "name": "Hyper Plus 66",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Zenith Ultra 67",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Zenith Air 68",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Pulse X 72",
+          "avg_rating": 5.0
+        },
+        {
+          "name": "Aero Max 77",
+          "avg_rating": 4.0
+        },
+        {
+          "name": "Zenith X 79",
+          "avg_rating": 4.67
+        },
+        {
+          "name": "Hyper Core 80",
+          "avg_rating": 4.5
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT p.name, ROUND(AVG(r.rating), 2) AS avg_rating FROM products p\n              JOIN reviews r ON r.product_id = p.product_id GROUP BY p.product_id, p.name\n              HAVING AVG(r.rating) > (SELECT AVG(rating) FROM reviews)"
+      ]
+    },
+    {
+      "id": "v4_051",
+      "question": "For each customer city, show the city and the total value in cents of the items in its customers' delivered orders (quantity times unit price).",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT cu.city, SUM(oi.quantity * oi.unit_price_cents) AS delivered_value_cents FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id\n       JOIN order_items oi ON oi.order_id = o.order_id\n       WHERE o.status = 'delivered' GROUP BY cu.city",
+      "expected_columns": [
+        "city",
+        "delivered_value_cents"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "delivered_value_cents": 12845325
+        },
+        {
+          "city": "Dnipro",
+          "delivered_value_cents": 14799602
+        },
+        {
+          "city": "Kharkiv",
+          "delivered_value_cents": 10059762
+        },
+        {
+          "city": "Kyiv",
+          "delivered_value_cents": 17543397
+        },
+        {
+          "city": "Lviv",
+          "delivered_value_cents": 18523127
+        },
+        {
+          "city": "Odesa",
+          "delivered_value_cents": 5725852
+        },
+        {
+          "city": "Poltava",
+          "delivered_value_cents": 6273756
+        },
+        {
+          "city": "Vinnytsia",
+          "delivered_value_cents": 6566237
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.city, SUM(oi.unit_price_cents) AS delivered_value_cents FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id\n              JOIN order_items oi ON oi.order_id = o.order_id\n              WHERE o.status = 'delivered' GROUP BY cu.city"
+      ]
+    },
+    {
+      "id": "v4_052",
+      "question": "For each product category, show the category name and the number of units sold in orders with status 'delivered'.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT c.name AS category_name, SUM(oi.quantity) AS units_sold FROM categories c\n       JOIN products p ON p.category_id = c.category_id\n       JOIN order_items oi ON oi.product_id = p.product_id\n       JOIN orders o ON o.order_id = oi.order_id\n       WHERE o.status = 'delivered' GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "units_sold"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "units_sold": 73
+        },
+        {
+          "category_name": "Smartphones",
+          "units_sold": 104
+        },
+        {
+          "category_name": "Monitors",
+          "units_sold": 93
+        },
+        {
+          "category_name": "Components",
+          "units_sold": 65
+        },
+        {
+          "category_name": "Peripherals",
+          "units_sold": 87
+        },
+        {
+          "category_name": "Audio",
+          "units_sold": 50
+        },
+        {
+          "category_name": "Networking Equipment",
+          "units_sold": 108
+        },
+        {
+          "category_name": "Accessories",
+          "units_sold": 66
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(*) AS units_sold FROM categories c\n              JOIN products p ON p.category_id = c.category_id\n              JOIN order_items oi ON oi.product_id = p.product_id\n              JOIN orders o ON o.order_id = oi.order_id\n              WHERE o.status = 'delivered' GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_053",
+      "question": "For each supplier, show the supplier name and the revenue in cents from its products in orders with status 'delivered' (quantity times unit price).",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT s.name AS supplier_name, SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents FROM suppliers s\n       JOIN products p ON p.supplier_id = s.supplier_id\n       JOIN order_items oi ON oi.product_id = p.product_id\n       JOIN orders o ON o.order_id = oi.order_id\n       WHERE o.status = 'delivered' GROUP BY s.supplier_id, s.name",
+      "expected_columns": [
+        "supplier_name",
+        "revenue_cents"
+      ],
+      "expected_result": [
+        {
+          "supplier_name": "TechNova",
+          "revenue_cents": 7975974
+        },
+        {
+          "supplier_name": "DigitalCore",
+          "revenue_cents": 3280233
+        },
+        {
+          "supplier_name": "NextWave",
+          "revenue_cents": 10599701
+        },
+        {
+          "supplier_name": "ElectroHub",
+          "revenue_cents": 6002566
+        },
+        {
+          "supplier_name": "SmartSupply",
+          "revenue_cents": 7260587
+        },
+        {
+          "supplier_name": "ByteWorks",
+          "revenue_cents": 11624007
+        },
+        {
+          "supplier_name": "GlobalTech",
+          "revenue_cents": 10517393
+        },
+        {
+          "supplier_name": "NovaParts",
+          "revenue_cents": 7269545
+        },
+        {
+          "supplier_name": "DeviceWorld",
+          "revenue_cents": 3881284
+        },
+        {
+          "supplier_name": "PrimeSystems",
+          "revenue_cents": 5824550
+        },
+        {
+          "supplier_name": "MegaElectro",
+          "revenue_cents": 12767642
+        },
+        {
+          "supplier_name": "FutureGear",
+          "revenue_cents": 5333576
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.name AS supplier_name, SUM(oi.quantity * oi.unit_price_cents) AS revenue_cents FROM suppliers s\n              JOIN products p ON p.supplier_id = s.supplier_id\n              JOIN order_items oi ON oi.product_id = p.product_id\n              GROUP BY s.supplier_id, s.name"
+      ]
+    },
+    {
+      "id": "v4_054",
+      "question": "For each shipping carrier, what is the average order value in cents? Compute each order's value as the sum of quantity times unit price over its items, then average these values over the carrier's orders. Show the average rounded to two decimals.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT s.carrier, ROUND(AVG(t.order_value), 2) AS avg_order_value_cents FROM shipments s\n       JOIN (SELECT order_id, SUM(quantity * unit_price_cents) AS order_value FROM order_items GROUP BY order_id) t\n         ON t.order_id = s.order_id GROUP BY s.carrier",
+      "expected_columns": [
+        "carrier",
+        "avg_order_value_cents"
+      ],
+      "expected_result": [
+        {
+          "carrier": "Meest",
+          "avg_order_value_cents": 687411.84
+        },
+        {
+          "carrier": "Nova Post",
+          "avg_order_value_cents": 799453.72
+        },
+        {
+          "carrier": "Ukrposhta",
+          "avg_order_value_cents": 592340.33
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.carrier, ROUND(AVG(oi.quantity * oi.unit_price_cents), 2) AS avg_order_value_cents FROM shipments s\n              JOIN order_items oi ON oi.order_id = s.order_id GROUP BY s.carrier"
+      ]
+    },
+    {
+      "id": "v4_055",
+      "question": "For each customer city, how many different customers have placed at least one order? Show the city and that number.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT cu.city, COUNT(DISTINCT cu.customer_id) AS ordering_customers FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id GROUP BY cu.city",
+      "expected_columns": [
+        "city",
+        "ordering_customers"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "ordering_customers": 11
+        },
+        {
+          "city": "Dnipro",
+          "ordering_customers": 12
+        },
+        {
+          "city": "Kharkiv",
+          "ordering_customers": 13
+        },
+        {
+          "city": "Kyiv",
+          "ordering_customers": 13
+        },
+        {
+          "city": "Lviv",
+          "ordering_customers": 17
+        },
+        {
+          "city": "Odesa",
+          "ordering_customers": 4
+        },
+        {
+          "city": "Poltava",
+          "ordering_customers": 7
+        },
+        {
+          "city": "Vinnytsia",
+          "ordering_customers": 6
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.city, COUNT(*) AS ordering_customers FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id GROUP BY cu.city"
+      ]
+    },
+    {
+      "id": "v4_056",
+      "question": "For each product category, how many different customers have ordered at least one of its products? Show the category name and that number.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT c.name AS category_name, COUNT(DISTINCT o.customer_id) AS customer_count FROM categories c\n       JOIN products p ON p.category_id = c.category_id\n       JOIN order_items oi ON oi.product_id = p.product_id\n       JOIN orders o ON o.order_id = oi.order_id GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "customer_count": 52
+        },
+        {
+          "category_name": "Smartphones",
+          "customer_count": 60
+        },
+        {
+          "category_name": "Monitors",
+          "customer_count": 59
+        },
+        {
+          "category_name": "Components",
+          "customer_count": 53
+        },
+        {
+          "category_name": "Peripherals",
+          "customer_count": 48
+        },
+        {
+          "category_name": "Audio",
+          "customer_count": 49
+        },
+        {
+          "category_name": "Networking Equipment",
+          "customer_count": 54
+        },
+        {
+          "category_name": "Accessories",
+          "customer_count": 57
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(o.customer_id) AS customer_count FROM categories c\n              JOIN products p ON p.category_id = c.category_id\n              JOIN order_items oi ON oi.product_id = p.product_id\n              JOIN orders o ON o.order_id = oi.order_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_057",
+      "question": "For each supplier, show the supplier name and the number of reviews that its products have received.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT s.name AS supplier_name, COUNT(r.review_id) AS review_count FROM suppliers s\n       JOIN products p ON p.supplier_id = s.supplier_id\n       JOIN reviews r ON r.product_id = p.product_id GROUP BY s.supplier_id, s.name",
+      "expected_columns": [
+        "supplier_name",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "supplier_name": "TechNova",
+          "review_count": 19
+        },
+        {
+          "supplier_name": "DigitalCore",
+          "review_count": 17
+        },
+        {
+          "supplier_name": "NextWave",
+          "review_count": 17
+        },
+        {
+          "supplier_name": "ElectroHub",
+          "review_count": 16
+        },
+        {
+          "supplier_name": "SmartSupply",
+          "review_count": 24
+        },
+        {
+          "supplier_name": "ByteWorks",
+          "review_count": 21
+        },
+        {
+          "supplier_name": "GlobalTech",
+          "review_count": 13
+        },
+        {
+          "supplier_name": "NovaParts",
+          "review_count": 17
+        },
+        {
+          "supplier_name": "DeviceWorld",
+          "review_count": 22
+        },
+        {
+          "supplier_name": "PrimeSystems",
+          "review_count": 11
+        },
+        {
+          "supplier_name": "MegaElectro",
+          "review_count": 15
+        },
+        {
+          "supplier_name": "FutureGear",
+          "review_count": 8
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.name AS supplier_name, COUNT(DISTINCT p.product_id) AS review_count FROM suppliers s\n              JOIN products p ON p.supplier_id = s.supplier_id\n              JOIN reviews r ON r.product_id = p.product_id GROUP BY s.supplier_id, s.name"
+      ]
+    },
+    {
+      "id": "v4_058",
+      "question": "For each coupon that was used in at least five orders, show the coupon code and the total discount in cents given through it.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT c.code, SUM(o.discount_cents) AS total_discount_cents FROM coupons c\n       JOIN orders o ON o.coupon_id = c.coupon_id GROUP BY c.coupon_id, c.code HAVING COUNT(*) >= 5",
+      "expected_columns": [
+        "code",
+        "total_discount_cents"
+      ],
+      "expected_result": [
+        {
+          "code": "SALE01",
+          "total_discount_cents": 147932
+        },
+        {
+          "code": "SALE02",
+          "total_discount_cents": 1032063
+        },
+        {
+          "code": "SALE03",
+          "total_discount_cents": 289802
+        },
+        {
+          "code": "SALE04",
+          "total_discount_cents": 318478
+        },
+        {
+          "code": "SALE07",
+          "total_discount_cents": 572063
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.code, SUM(o.discount_cents) AS total_discount_cents FROM coupons c\n              JOIN orders o ON o.coupon_id = c.coupon_id GROUP BY c.coupon_id, c.code"
+      ]
+    },
+    {
+      "id": "v4_059",
+      "question": "For each customer city, show the city and the total amount in cents of payments with status 'successful' for its customers' orders.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT cu.city, SUM(p.amount_cents) AS successful_cents FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id\n       JOIN payments p ON p.order_id = o.order_id\n       WHERE p.status = 'successful' GROUP BY cu.city",
+      "expected_columns": [
+        "city",
+        "successful_cents"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "successful_cents": 19386618
+        },
+        {
+          "city": "Dnipro",
+          "successful_cents": 20020907
+        },
+        {
+          "city": "Kharkiv",
+          "successful_cents": 21259923
+        },
+        {
+          "city": "Kyiv",
+          "successful_cents": 25826114
+        },
+        {
+          "city": "Lviv",
+          "successful_cents": 35531072
+        },
+        {
+          "city": "Odesa",
+          "successful_cents": 10374876
+        },
+        {
+          "city": "Poltava",
+          "successful_cents": 15185632
+        },
+        {
+          "city": "Vinnytsia",
+          "successful_cents": 9945956
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.city, SUM(p.amount_cents) AS successful_cents FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id\n              JOIN payments p ON p.order_id = o.order_id GROUP BY cu.city"
+      ]
+    },
+    {
+      "id": "v4_060",
+      "question": "For each payment status, how many different orders have at least one payment with that status? Show the status and the number of orders.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT status, COUNT(DISTINCT order_id) AS order_count FROM payments GROUP BY status",
+      "expected_columns": [
+        "status",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "status": "failed",
+          "order_count": 21
+        },
+        {
+          "status": "pending",
+          "order_count": 19
+        },
+        {
+          "status": "refunded",
+          "order_count": 13
+        },
+        {
+          "status": "successful",
+          "order_count": 228
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT status, COUNT(*) AS order_count FROM payments GROUP BY status"
+      ]
+    },
+    {
+      "id": "v4_061",
+      "question": "For each product category, show the category name and the number of order item rows that belong to orders with status 'cancelled'.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT c.name AS category_name, COUNT(*) AS cancelled_item_rows FROM categories c\n       JOIN products p ON p.category_id = c.category_id\n       JOIN order_items oi ON oi.product_id = p.product_id\n       JOIN orders o ON o.order_id = oi.order_id\n       WHERE o.status = 'cancelled' GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "cancelled_item_rows"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "cancelled_item_rows": 11
+        },
+        {
+          "category_name": "Smartphones",
+          "cancelled_item_rows": 8
+        },
+        {
+          "category_name": "Monitors",
+          "cancelled_item_rows": 14
+        },
+        {
+          "category_name": "Components",
+          "cancelled_item_rows": 5
+        },
+        {
+          "category_name": "Peripherals",
+          "cancelled_item_rows": 6
+        },
+        {
+          "category_name": "Audio",
+          "cancelled_item_rows": 5
+        },
+        {
+          "category_name": "Networking Equipment",
+          "cancelled_item_rows": 10
+        },
+        {
+          "category_name": "Accessories",
+          "cancelled_item_rows": 9
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(*) AS cancelled_item_rows FROM categories c\n              JOIN products p ON p.category_id = c.category_id\n              JOIN order_items oi ON oi.product_id = p.product_id\n              JOIN orders o ON o.order_id = oi.order_id\n              WHERE o.status = 'delivered' GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_062",
+      "question": "For each shipping carrier, how many different customers have had a shipment handled by it? Show the carrier and that number.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT s.carrier, COUNT(DISTINCT o.customer_id) AS customer_count FROM shipments s\n       JOIN orders o ON o.order_id = s.order_id GROUP BY s.carrier",
+      "expected_columns": [
+        "carrier",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "carrier": "Meest",
+          "customer_count": 52
+        },
+        {
+          "carrier": "Nova Post",
+          "customer_count": 47
+        },
+        {
+          "carrier": "Ukrposhta",
+          "customer_count": 41
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.carrier, COUNT(o.customer_id) AS customer_count FROM shipments s\n              JOIN orders o ON o.order_id = s.order_id GROUP BY s.carrier"
+      ]
+    },
+    {
+      "id": "v4_063",
+      "question": "Which three customers have spent the most on delivered orders, counting quantity times unit price of the items? Show the customer's full name and the total in cents, sorted by the total in descending order.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT cu.full_name, SUM(oi.quantity * oi.unit_price_cents) AS total_cents FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id\n       JOIN order_items oi ON oi.order_id = o.order_id\n       WHERE o.status = 'delivered' GROUP BY cu.customer_id, cu.full_name\n       ORDER BY total_cents DESC, cu.customer_id LIMIT 3",
+      "expected_columns": [
+        "full_name",
+        "total_cents"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Dmytro Oliinyk",
+          "total_cents": 5237369
+        },
+        {
+          "full_name": "Ivan Tkachenko",
+          "total_cents": 4235427
+        },
+        {
+          "full_name": "Artem Tkachenko",
+          "total_cents": 3178178
+        }
+      ],
+      "order_key": [
+        "full_name"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT cu.full_name, SUM(oi.quantity * oi.unit_price_cents) AS total_cents FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id\n              JOIN order_items oi ON oi.order_id = o.order_id\n              GROUP BY cu.customer_id, cu.full_name\n              ORDER BY total_cents DESC, cu.customer_id LIMIT 3"
+      ]
+    },
+    {
+      "id": "v4_064",
+      "question": "For each supplier, show the supplier name and the average rating of all reviews of its products, rounded to two decimals.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT s.name AS supplier_name, ROUND(AVG(r.rating), 2) AS avg_rating FROM suppliers s\n       JOIN products p ON p.supplier_id = s.supplier_id\n       JOIN reviews r ON r.product_id = p.product_id GROUP BY s.supplier_id, s.name",
+      "expected_columns": [
+        "supplier_name",
+        "avg_rating"
+      ],
+      "expected_result": [
+        {
+          "supplier_name": "TechNova",
+          "avg_rating": 3.79
+        },
+        {
+          "supplier_name": "DigitalCore",
+          "avg_rating": 4.18
+        },
+        {
+          "supplier_name": "NextWave",
+          "avg_rating": 3.88
+        },
+        {
+          "supplier_name": "ElectroHub",
+          "avg_rating": 4.63
+        },
+        {
+          "supplier_name": "SmartSupply",
+          "avg_rating": 4.0
+        },
+        {
+          "supplier_name": "ByteWorks",
+          "avg_rating": 4.52
+        },
+        {
+          "supplier_name": "GlobalTech",
+          "avg_rating": 4.62
+        },
+        {
+          "supplier_name": "NovaParts",
+          "avg_rating": 4.29
+        },
+        {
+          "supplier_name": "DeviceWorld",
+          "avg_rating": 4.09
+        },
+        {
+          "supplier_name": "PrimeSystems",
+          "avg_rating": 4.73
+        },
+        {
+          "supplier_name": "MegaElectro",
+          "avg_rating": 4.53
+        },
+        {
+          "supplier_name": "FutureGear",
+          "avg_rating": 4.25
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT supplier_name, ROUND(AVG(product_avg), 2) AS avg_rating FROM\n              (SELECT s.name AS supplier_name, AVG(r.rating) AS product_avg FROM suppliers s\n               JOIN products p ON p.supplier_id = s.supplier_id\n               JOIN reviews r ON r.product_id = p.product_id GROUP BY s.supplier_id, s.name, p.product_id)\n              GROUP BY supplier_name"
+      ]
+    },
+    {
+      "id": "v4_065",
+      "question": "For each order status, show the status and the total number of units, counting item quantities, in orders with that status.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT o.status, SUM(oi.quantity) AS total_units FROM orders o\n       JOIN order_items oi ON oi.order_id = o.order_id GROUP BY o.status",
+      "expected_columns": [
+        "status",
+        "total_units"
+      ],
+      "expected_result": [
+        {
+          "status": "cancelled",
+          "total_units": 138
+        },
+        {
+          "status": "delivered",
+          "total_units": 646
+        },
+        {
+          "status": "pending",
+          "total_units": 105
+        },
+        {
+          "status": "processing",
+          "total_units": 230
+        },
+        {
+          "status": "returned",
+          "total_units": 80
+        },
+        {
+          "status": "shipped",
+          "total_units": 322
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT o.status, COUNT(*) AS total_units FROM orders o\n              JOIN order_items oi ON oi.order_id = o.order_id GROUP BY o.status"
+      ]
+    },
+    {
+      "id": "v4_066",
+      "question": "For each customer city, show the city and the number of reviews written by its customers.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT cu.city, COUNT(r.review_id) AS review_count FROM customers cu\n       JOIN reviews r ON r.customer_id = cu.customer_id GROUP BY cu.city",
+      "expected_columns": [
+        "city",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "review_count": 23
+        },
+        {
+          "city": "Dnipro",
+          "review_count": 35
+        },
+        {
+          "city": "Kharkiv",
+          "review_count": 28
+        },
+        {
+          "city": "Kyiv",
+          "review_count": 22
+        },
+        {
+          "city": "Lviv",
+          "review_count": 46
+        },
+        {
+          "city": "Odesa",
+          "review_count": 17
+        },
+        {
+          "city": "Poltava",
+          "review_count": 18
+        },
+        {
+          "city": "Vinnytsia",
+          "review_count": 11
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.city, COUNT(DISTINCT cu.customer_id) AS review_count FROM customers cu\n              JOIN reviews r ON r.customer_id = cu.customer_id GROUP BY cu.city"
+      ]
+    },
+    {
+      "id": "v4_067",
+      "question": "For each product category, show the category name and the number of different suppliers that provide at least one product in it.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT c.name AS category_name, COUNT(DISTINCT p.supplier_id) AS supplier_count FROM categories c\n       JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "supplier_count"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Smartphones",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Monitors",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Components",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Peripherals",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Audio",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Networking Equipment",
+          "supplier_count": 3
+        },
+        {
+          "category_name": "Accessories",
+          "supplier_count": 3
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(p.supplier_id) AS supplier_count FROM categories c\n              JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_068",
+      "question": "How many orders did customers from 'Lviv' place in each month of 2025? Show the month in the format YYYY-MM and the number of orders.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y-%m', o.ordered_at) AS order_month, COUNT(*) AS order_count FROM orders o\n       JOIN customers cu ON cu.customer_id = o.customer_id\n       WHERE cu.city = 'Lviv' AND o.ordered_at >= '2025-01-01' AND o.ordered_at < '2026-01-01'\n       GROUP BY strftime('%Y-%m', o.ordered_at)",
+      "expected_columns": [
+        "order_month",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "order_month": "2025-01",
+          "order_count": 2
+        },
+        {
+          "order_month": "2025-02",
+          "order_count": 7
+        },
+        {
+          "order_month": "2025-03",
+          "order_count": 2
+        },
+        {
+          "order_month": "2025-04",
+          "order_count": 1
+        },
+        {
+          "order_month": "2025-05",
+          "order_count": 8
+        },
+        {
+          "order_month": "2025-06",
+          "order_count": 4
+        },
+        {
+          "order_month": "2025-07",
+          "order_count": 1
+        },
+        {
+          "order_month": "2025-08",
+          "order_count": 3
+        },
+        {
+          "order_month": "2025-10",
+          "order_count": 4
+        },
+        {
+          "order_month": "2025-11",
+          "order_count": 4
+        },
+        {
+          "order_month": "2025-12",
+          "order_count": 3
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y-%m', ordered_at) AS order_month, COUNT(*) AS order_count FROM orders\n              WHERE ordered_at >= '2025-01-01' AND ordered_at < '2026-01-01' GROUP BY strftime('%Y-%m', ordered_at)"
+      ]
+    },
+    {
+      "id": "v4_069",
+      "question": "What was the total value in cents of order items for orders placed in each quarter of 2026? Show the quarter number from 1 to 4 and the total.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT (CAST(strftime('%m', o.ordered_at) AS INTEGER) + 2) / 3 AS quarter_number,\n              SUM(oi.quantity * oi.unit_price_cents) AS total_cents\n       FROM orders o JOIN order_items oi ON oi.order_id = o.order_id\n       WHERE o.ordered_at >= '2026-01-01' AND o.ordered_at < '2027-01-01'\n       GROUP BY (CAST(strftime('%m', o.ordered_at) AS INTEGER) + 2) / 3",
+      "expected_columns": [
+        "quarter_number",
+        "total_cents"
+      ],
+      "expected_result": [
+        {
+          "quarter_number": 1,
+          "total_cents": 34730954
+        },
+        {
+          "quarter_number": 2,
+          "total_cents": 34146528
+        },
+        {
+          "quarter_number": 3,
+          "total_cents": 28842779
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT (CAST(strftime('%m', o.ordered_at) AS INTEGER) + 2) / 3 AS quarter_number,\n                     SUM(oi.quantity * oi.unit_price_cents) AS total_cents\n              FROM orders o JOIN order_items oi ON oi.order_id = o.order_id\n              GROUP BY (CAST(strftime('%m', o.ordered_at) AS INTEGER) + 2) / 3"
+      ]
+    },
+    {
+      "id": "v4_070",
+      "question": "How many customers registered in each month of 2024? Show the month in the format YYYY-MM and the number of customers.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y-%m', registered_at) AS registration_month, COUNT(*) AS customer_count FROM customers\n       WHERE registered_at >= '2024-01-01' AND registered_at < '2025-01-01'\n       GROUP BY strftime('%Y-%m', registered_at)",
+      "expected_columns": [
+        "registration_month",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "registration_month": "2024-01",
+          "customer_count": 8
+        },
+        {
+          "registration_month": "2024-02",
+          "customer_count": 3
+        },
+        {
+          "registration_month": "2024-03",
+          "customer_count": 5
+        },
+        {
+          "registration_month": "2024-04",
+          "customer_count": 4
+        },
+        {
+          "registration_month": "2024-05",
+          "customer_count": 2
+        },
+        {
+          "registration_month": "2024-06",
+          "customer_count": 6
+        },
+        {
+          "registration_month": "2024-07",
+          "customer_count": 6
+        },
+        {
+          "registration_month": "2024-08",
+          "customer_count": 3
+        },
+        {
+          "registration_month": "2024-09",
+          "customer_count": 4
+        },
+        {
+          "registration_month": "2024-10",
+          "customer_count": 5
+        },
+        {
+          "registration_month": "2024-11",
+          "customer_count": 5
+        },
+        {
+          "registration_month": "2024-12",
+          "customer_count": 3
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%m', registered_at) AS registration_month, COUNT(*) AS customer_count FROM customers\n              GROUP BY strftime('%m', registered_at)"
+      ]
+    },
+    {
+      "id": "v4_071",
+      "question": "How many shipments were shipped in each month of 2026, based on the shipped date? Show the month in the format YYYY-MM and the number of shipments.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y-%m', shipped_at) AS shipped_month, COUNT(*) AS shipment_count FROM shipments\n       WHERE shipped_at >= '2026-01-01' AND shipped_at < '2027-01-01' GROUP BY strftime('%Y-%m', shipped_at)",
+      "expected_columns": [
+        "shipped_month",
+        "shipment_count"
+      ],
+      "expected_result": [
+        {
+          "shipped_month": "2026-01",
+          "shipment_count": 11
+        },
+        {
+          "shipped_month": "2026-02",
+          "shipment_count": 7
+        },
+        {
+          "shipped_month": "2026-03",
+          "shipment_count": 9
+        },
+        {
+          "shipped_month": "2026-04",
+          "shipment_count": 13
+        },
+        {
+          "shipped_month": "2026-05",
+          "shipment_count": 8
+        },
+        {
+          "shipped_month": "2026-06",
+          "shipment_count": 9
+        },
+        {
+          "shipped_month": "2026-07",
+          "shipment_count": 9
+        },
+        {
+          "shipped_month": "2026-08",
+          "shipment_count": 11
+        },
+        {
+          "shipped_month": "2026-09",
+          "shipment_count": 8
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y-%m', shipped_at) AS shipped_month, COUNT(*) AS shipment_count FROM shipments\n              GROUP BY strftime('%Y-%m', shipped_at)"
+      ]
+    },
+    {
+      "id": "v4_072",
+      "question": "How many reviews were created in each year? Show the year and the number of reviews.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y', created_at) AS review_year, COUNT(*) AS review_count FROM reviews GROUP BY strftime('%Y', created_at)",
+      "expected_columns": [
+        "review_year",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "review_year": "2025",
+          "review_count": 111
+        },
+        {
+          "review_year": "2026",
+          "review_count": 89
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y', created_at) AS review_year, COUNT(DISTINCT product_id) AS review_count FROM reviews GROUP BY strftime('%Y', created_at)"
+      ]
+    },
+    {
+      "id": "v4_073",
+      "question": "In which month of 2025 were the most orders placed? Show the month in the format YYYY-MM and the number of orders.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y-%m', ordered_at) AS order_month, COUNT(*) AS order_count FROM orders\n       WHERE ordered_at >= '2025-01-01' AND ordered_at < '2026-01-01'\n       GROUP BY strftime('%Y-%m', ordered_at) ORDER BY order_count DESC, order_month LIMIT 1",
+      "expected_columns": [
+        "order_month",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "order_month": "2025-11",
+          "order_count": 22
+        }
+      ],
+      "order_key": [
+        "order_month"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y-%m', ordered_at) AS order_month, COUNT(*) AS order_count FROM orders\n              WHERE ordered_at >= '2025-01-01' AND ordered_at < '2026-01-01'\n              GROUP BY strftime('%Y-%m', ordered_at) ORDER BY order_count ASC, order_month LIMIT 1"
+      ]
+    },
+    {
+      "id": "v4_074",
+      "question": "How many orders were placed on each day of the week? Show the weekday number from 0 (Sunday) to 6 (Saturday) and the number of orders.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT CAST(strftime('%w', ordered_at) AS INTEGER) AS weekday, COUNT(*) AS order_count FROM orders GROUP BY CAST(strftime('%w', ordered_at) AS INTEGER)",
+      "expected_columns": [
+        "weekday",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "weekday": 0,
+          "order_count": 44
+        },
+        {
+          "weekday": 1,
+          "order_count": 39
+        },
+        {
+          "weekday": 2,
+          "order_count": 38
+        },
+        {
+          "weekday": 3,
+          "order_count": 41
+        },
+        {
+          "weekday": 4,
+          "order_count": 50
+        },
+        {
+          "weekday": 5,
+          "order_count": 52
+        },
+        {
+          "weekday": 6,
+          "order_count": 36
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT CAST(strftime('%w', ordered_at) AS INTEGER) AS weekday, COUNT(DISTINCT customer_id) AS order_count FROM orders GROUP BY CAST(strftime('%w', ordered_at) AS INTEGER)"
+      ]
+    },
+    {
+      "id": "v4_075",
+      "question": "What is the total amount in cents of successful payments made in each month of 2026, based on the payment date? Show the month in the format YYYY-MM and the total.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT strftime('%Y-%m', paid_at) AS payment_month, SUM(amount_cents) AS total_cents FROM payments\n       WHERE status = 'successful' AND paid_at >= '2026-01-01' AND paid_at < '2027-01-01'\n       GROUP BY strftime('%Y-%m', paid_at)",
+      "expected_columns": [
+        "payment_month",
+        "total_cents"
+      ],
+      "expected_result": [
+        {
+          "payment_month": "2026-01",
+          "total_cents": 9286955
+        },
+        {
+          "payment_month": "2026-02",
+          "total_cents": 8202368
+        },
+        {
+          "payment_month": "2026-03",
+          "total_cents": 10537265
+        },
+        {
+          "payment_month": "2026-04",
+          "total_cents": 10326888
+        },
+        {
+          "payment_month": "2026-05",
+          "total_cents": 7206382
+        },
+        {
+          "payment_month": "2026-06",
+          "total_cents": 5781230
+        },
+        {
+          "payment_month": "2026-07",
+          "total_cents": 10700331
+        },
+        {
+          "payment_month": "2026-08",
+          "total_cents": 4668238
+        },
+        {
+          "payment_month": "2026-09",
+          "total_cents": 8457091
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT strftime('%Y-%m', paid_at) AS payment_month, SUM(amount_cents) AS total_cents FROM payments\n              WHERE paid_at >= '2026-01-01' AND paid_at < '2027-01-01' GROUP BY strftime('%Y-%m', paid_at)"
+      ]
+    },
+    {
+      "id": "v4_076",
+      "question": "How many coupons are valid on the date 2025-07-15, meaning that valid_from is on or before that date and valid_until is on or after it? Show the number as valid_coupons.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT COUNT(*) AS valid_coupons FROM coupons WHERE valid_from <= '2025-07-15' AND valid_until >= '2025-07-15'",
+      "expected_columns": [
+        "valid_coupons"
+      ],
+      "expected_result": [
+        {
+          "valid_coupons": 6
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT COUNT(*) AS valid_coupons FROM coupons WHERE valid_from <= '2025-07-15'"
+      ]
+    },
+    {
+      "id": "v4_077",
+      "question": "How many orders were placed in the first half of 2026 (January to June) and how many in the second half (July to December)? Show the half as 1 or 2 and the number of orders.",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT CASE WHEN CAST(strftime('%m', ordered_at) AS INTEGER) <= 6 THEN 1 ELSE 2 END AS half_year, COUNT(*) AS order_count\n       FROM orders WHERE ordered_at >= '2026-01-01' AND ordered_at < '2027-01-01'\n       GROUP BY CASE WHEN CAST(strftime('%m', ordered_at) AS INTEGER) <= 6 THEN 1 ELSE 2 END",
+      "expected_columns": [
+        "half_year",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "half_year": 1,
+          "order_count": 88
+        },
+        {
+          "half_year": 2,
+          "order_count": 39
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT CASE WHEN CAST(strftime('%m', ordered_at) AS INTEGER) <= 6 THEN 1 ELSE 2 END AS half_year, COUNT(*) AS order_count\n              FROM orders GROUP BY CASE WHEN CAST(strftime('%m', ordered_at) AS INTEGER) <= 6 THEN 1 ELSE 2 END"
+      ]
+    },
+    {
+      "id": "v4_078",
+      "question": "Which products have never been reviewed? Show the product name.",
+      "category": "negation",
+      "reference_sql": "SELECT name FROM products WHERE product_id NOT IN (SELECT product_id FROM reviews)",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "Hyper Core 11"
+        },
+        {
+          "name": "Orbit Plus 12"
+        },
+        {
+          "name": "Pulse Elite 15"
+        },
+        {
+          "name": "Vector Max 24"
+        },
+        {
+          "name": "Titan Plus 36"
+        },
+        {
+          "name": "Zenith Pro 54"
+        },
+        {
+          "name": "Zenith X 70"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name FROM products WHERE product_id NOT IN (SELECT product_id FROM order_items)"
+      ]
+    },
+    {
+      "id": "v4_079",
+      "question": "Which customers have never placed an order? Show the customer's full name.",
+      "category": "negation",
+      "reference_sql": "SELECT full_name FROM customers WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = customers.customer_id)",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Olena Tkachenko"
+        },
+        {
+          "full_name": "Maria Kovalenko"
+        },
+        {
+          "full_name": "Maksym Bondarenko"
+        },
+        {
+          "full_name": "Dmytro Shevchenko"
+        },
+        {
+          "full_name": "Anna Kravchenko"
+        },
+        {
+          "full_name": "Nikita Shevchenko"
+        },
+        {
+          "full_name": "Oleksandr Bondarenko"
+        },
+        {
+          "full_name": "Oleksandr Kovalenko"
+        },
+        {
+          "full_name": "Nikita Shevchenko"
+        },
+        {
+          "full_name": "Ivan Oliinyk"
+        },
+        {
+          "full_name": "Maria Tkachenko"
+        },
+        {
+          "full_name": "Daria Boiko"
+        },
+        {
+          "full_name": "Dmytro Kovalenko"
+        },
+        {
+          "full_name": "Oleksandr Kravchenko"
+        },
+        {
+          "full_name": "Anna Bondarenko"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Dmytro Tkachenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT full_name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders WHERE status = 'delivered')"
+      ]
+    },
+    {
+      "id": "v4_080",
+      "question": "Which products have never been ordered? Show the product name.",
+      "category": "negation",
+      "reference_sql": "SELECT name FROM products WHERE NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = products.product_id)",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "Zenith X 79"
+        },
+        {
+          "name": "Hyper Core 80"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT name FROM products WHERE product_id NOT IN (SELECT product_id FROM reviews)"
+      ]
+    },
+    {
+      "id": "v4_081",
+      "question": "Which orders have no payment record at all? Show the order ID.",
+      "category": "negation",
+      "reference_sql": "SELECT o.order_id FROM orders o WHERE NOT EXISTS (SELECT 1 FROM payments p WHERE p.order_id = o.order_id)",
+      "expected_columns": [
+        "order_id"
+      ],
+      "expected_result": [
+        {
+          "order_id": 91
+        },
+        {
+          "order_id": 37
+        },
+        {
+          "order_id": 16
+        },
+        {
+          "order_id": 148
+        },
+        {
+          "order_id": 53
+        },
+        {
+          "order_id": 236
+        },
+        {
+          "order_id": 277
+        },
+        {
+          "order_id": 109
+        },
+        {
+          "order_id": 106
+        },
+        {
+          "order_id": 65
+        },
+        {
+          "order_id": 165
+        },
+        {
+          "order_id": 115
+        },
+        {
+          "order_id": 74
+        },
+        {
+          "order_id": 64
+        },
+        {
+          "order_id": 157
+        },
+        {
+          "order_id": 162
+        },
+        {
+          "order_id": 21
+        },
+        {
+          "order_id": 181
+        },
+        {
+          "order_id": 185
+        },
+        {
+          "order_id": 228
+        },
+        {
+          "order_id": 81
+        },
+        {
+          "order_id": 49
+        },
+        {
+          "order_id": 234
+        },
+        {
+          "order_id": 125
+        },
+        {
+          "order_id": 88
+        },
+        {
+          "order_id": 116
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT o.order_id FROM orders o LEFT JOIN payments p ON p.order_id = o.order_id\n              WHERE p.status IS NULL OR p.status <> 'successful'"
+      ]
+    },
+    {
+      "id": "v4_082",
+      "question": "Which customers have placed orders, but none of their orders has the status 'delivered'? Show the customer's full name.",
+      "category": "negation",
+      "reference_sql": "SELECT cu.full_name FROM customers cu\n       WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = cu.customer_id)\n         AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = cu.customer_id AND o.status = 'delivered')",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Nikita Bondarenko"
+        },
+        {
+          "full_name": "Nikita Boiko"
+        },
+        {
+          "full_name": "Olena Moroz"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Maria Melnyk"
+        },
+        {
+          "full_name": "Sofia Kravchenko"
+        },
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Nikita Polishchuk"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Olena Oliinyk"
+        },
+        {
+          "full_name": "Viktoria Kravchenko"
+        },
+        {
+          "full_name": "Maksym Polishchuk"
+        },
+        {
+          "full_name": "Anna Shevchenko"
+        },
+        {
+          "full_name": "Ivan Tkachenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT cu.full_name FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id\n              WHERE o.status <> 'delivered'"
+      ]
+    },
+    {
+      "id": "v4_083",
+      "question": "Which customers have placed at least one order but have never written a review? Show the customer's full name.",
+      "category": "negation",
+      "reference_sql": "SELECT cu.full_name FROM customers cu\n       WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = cu.customer_id)\n         AND NOT EXISTS (SELECT 1 FROM reviews r WHERE r.customer_id = cu.customer_id)",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Maria Melnyk"
+        },
+        {
+          "full_name": "Nikita Kravchenko"
+        },
+        {
+          "full_name": "Artem Polishchuk"
+        },
+        {
+          "full_name": "Anna Tkachenko"
+        },
+        {
+          "full_name": "Daria Melnyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Artem Tkachenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.full_name FROM customers cu WHERE NOT EXISTS (SELECT 1 FROM reviews r WHERE r.customer_id = cu.customer_id)"
+      ]
+    },
+    {
+      "id": "v4_084",
+      "question": "Which customers have placed at least one order but have never used a coupon? Show the customer's full name.",
+      "category": "negation",
+      "reference_sql": "SELECT cu.full_name FROM customers cu\n       WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = cu.customer_id)\n         AND NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = cu.customer_id AND o.coupon_id IS NOT NULL)",
+      "expected_columns": [
+        "full_name"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Nikita Bondarenko"
+        },
+        {
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "full_name": "Olena Moroz"
+        },
+        {
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Sofia Moroz"
+        },
+        {
+          "full_name": "Maria Boiko"
+        },
+        {
+          "full_name": "Daria Kravchenko"
+        },
+        {
+          "full_name": "Maria Melnyk"
+        },
+        {
+          "full_name": "Sofia Kravchenko"
+        },
+        {
+          "full_name": "Maksym Bondarenko"
+        },
+        {
+          "full_name": "Artem Shevchenko"
+        },
+        {
+          "full_name": "Sofia Kovalenko"
+        },
+        {
+          "full_name": "Sofia Oliinyk"
+        },
+        {
+          "full_name": "Anna Moroz"
+        },
+        {
+          "full_name": "Nikita Polishchuk"
+        },
+        {
+          "full_name": "Anna Boiko"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Artem Moroz"
+        },
+        {
+          "full_name": "Viktoria Bondarenko"
+        },
+        {
+          "full_name": "Maksym Boiko"
+        },
+        {
+          "full_name": "Sofia Tkachenko"
+        },
+        {
+          "full_name": "Sofia Shevchenko"
+        },
+        {
+          "full_name": "Viktoria Polishchuk"
+        },
+        {
+          "full_name": "Dmytro Tkachenko"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Nikita Kravchenko"
+        },
+        {
+          "full_name": "Olena Bondarenko"
+        },
+        {
+          "full_name": "Maria Kravchenko"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Oleksandr Kravchenko"
+        },
+        {
+          "full_name": "Ivan Tkachenko"
+        },
+        {
+          "full_name": "Olena Oliinyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Artem Polishchuk"
+        },
+        {
+          "full_name": "Nikita Bondarenko"
+        },
+        {
+          "full_name": "Viktoria Kravchenko"
+        },
+        {
+          "full_name": "Anna Melnyk"
+        },
+        {
+          "full_name": "Anna Tkachenko"
+        },
+        {
+          "full_name": "Olena Melnyk"
+        },
+        {
+          "full_name": "Dmytro Oliinyk"
+        },
+        {
+          "full_name": "Anna Shevchenko"
+        },
+        {
+          "full_name": "Oleksandr Kovalenko"
+        },
+        {
+          "full_name": "Ivan Tkachenko"
+        },
+        {
+          "full_name": "Daria Melnyk"
+        },
+        {
+          "full_name": "Maria Oliinyk"
+        },
+        {
+          "full_name": "Anna Kravchenko"
+        },
+        {
+          "full_name": "Daria Moroz"
+        },
+        {
+          "full_name": "Ivan Melnyk"
+        },
+        {
+          "full_name": "Sofia Bondarenko"
+        },
+        {
+          "full_name": "Ivan Shevchenko"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT cu.full_name FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id\n              WHERE o.coupon_id IS NULL"
+      ]
+    },
+    {
+      "id": "v4_085",
+      "question": "Which orders with status 'processing' have no shipment record? Show the order ID.",
+      "category": "negation",
+      "reference_sql": "SELECT o.order_id FROM orders o\n       WHERE o.status = 'processing' AND NOT EXISTS (SELECT 1 FROM shipments s WHERE s.order_id = o.order_id)",
+      "expected_columns": [
+        "order_id"
+      ],
+      "expected_result": [
+        {
+          "order_id": 13
+        },
+        {
+          "order_id": 183
+        },
+        {
+          "order_id": 117
+        },
+        {
+          "order_id": 11
+        },
+        {
+          "order_id": 136
+        },
+        {
+          "order_id": 204
+        },
+        {
+          "order_id": 137
+        },
+        {
+          "order_id": 153
+        },
+        {
+          "order_id": 251
+        },
+        {
+          "order_id": 220
+        },
+        {
+          "order_id": 224
+        },
+        {
+          "order_id": 127
+        },
+        {
+          "order_id": 219
+        },
+        {
+          "order_id": 118
+        },
+        {
+          "order_id": 278
+        },
+        {
+          "order_id": 232
+        },
+        {
+          "order_id": 161
+        },
+        {
+          "order_id": 169
+        },
+        {
+          "order_id": 271
+        },
+        {
+          "order_id": 79
+        },
+        {
+          "order_id": 213
+        },
+        {
+          "order_id": 258
+        },
+        {
+          "order_id": 223
+        },
+        {
+          "order_id": 95
+        },
+        {
+          "order_id": 48
+        },
+        {
+          "order_id": 26
+        },
+        {
+          "order_id": 217
+        },
+        {
+          "order_id": 288
+        },
+        {
+          "order_id": 259
+        },
+        {
+          "order_id": 159
+        },
+        {
+          "order_id": 7
+        },
+        {
+          "order_id": 121
+        },
+        {
+          "order_id": 247
+        },
+        {
+          "order_id": 86
+        },
+        {
+          "order_id": 167
+        },
+        {
+          "order_id": 178
+        },
+        {
+          "order_id": 6
+        },
+        {
+          "order_id": 299
+        },
+        {
+          "order_id": 38
+        },
+        {
+          "order_id": 41
+        },
+        {
+          "order_id": 73
+        },
+        {
+          "order_id": 191
+        },
+        {
+          "order_id": 54
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT o.order_id FROM orders o\n              WHERE o.status = 'pending' AND NOT EXISTS (SELECT 1 FROM shipments s WHERE s.order_id = o.order_id)"
+      ]
+    },
+    {
+      "id": "v4_086",
+      "question": "Which coupons have never been used in any order? Show the coupon code.",
+      "category": "negation",
+      "reference_sql": "SELECT code FROM coupons WHERE coupon_id NOT IN (SELECT coupon_id FROM orders WHERE coupon_id IS NOT NULL)",
+      "expected_columns": [
+        "code"
+      ],
+      "expected_result": [
+        {
+          "code": "SALE08"
+        },
+        {
+          "code": "SALE09"
+        },
+        {
+          "code": "SALE10"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT code FROM coupons WHERE is_active = 0 AND valid_until < '2026-01-01'"
+      ]
+    },
+    {
+      "id": "v4_087",
+      "question": "Which suppliers have no inactive products at all? Show the supplier name.",
+      "category": "negation",
+      "reference_sql": "SELECT s.name FROM suppliers s\n       WHERE NOT EXISTS (SELECT 1 FROM products p WHERE p.supplier_id = s.supplier_id AND p.is_active = 0)",
+      "expected_columns": [
+        "name"
+      ],
+      "expected_result": [
+        {
+          "name": "DeviceWorld"
+        },
+        {
+          "name": "FutureGear"
+        },
+        {
+          "name": "GlobalTech"
+        },
+        {
+          "name": "MegaElectro"
+        },
+        {
+          "name": "NovaParts"
+        },
+        {
+          "name": "PrimeSystems"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT DISTINCT s.name FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id\n              WHERE p.is_active = 1"
+      ]
+    },
+    {
+      "id": "v4_088",
+      "question": "For each category, show the category name, the number of active products and the number of inactive products.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT c.name AS category_name,\n              SUM(CASE WHEN p.is_active = 1 THEN 1 ELSE 0 END) AS active_products,\n              SUM(CASE WHEN p.is_active = 0 THEN 1 ELSE 0 END) AS inactive_products\n       FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "active_products",
+        "inactive_products"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Smartphones",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Monitors",
+          "active_products": 10,
+          "inactive_products": 0
+        },
+        {
+          "category_name": "Components",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Peripherals",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Audio",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Networking Equipment",
+          "active_products": 9,
+          "inactive_products": 1
+        },
+        {
+          "category_name": "Accessories",
+          "active_products": 10,
+          "inactive_products": 0
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, COUNT(*) AS active_products, COUNT(*) AS inactive_products\n              FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_089",
+      "question": "For each customer city, show the city, the number of its customers' delivered orders and the number of their cancelled orders.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT cu.city,\n              SUM(CASE WHEN o.status = 'delivered' THEN 1 ELSE 0 END) AS delivered_orders,\n              SUM(CASE WHEN o.status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_orders\n       FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id GROUP BY cu.city",
+      "expected_columns": [
+        "city",
+        "delivered_orders",
+        "cancelled_orders"
+      ],
+      "expected_result": [
+        {
+          "city": "Cherkasy",
+          "delivered_orders": 15,
+          "cancelled_orders": 3
+        },
+        {
+          "city": "Dnipro",
+          "delivered_orders": 18,
+          "cancelled_orders": 3
+        },
+        {
+          "city": "Kharkiv",
+          "delivered_orders": 15,
+          "cancelled_orders": 5
+        },
+        {
+          "city": "Kyiv",
+          "delivered_orders": 21,
+          "cancelled_orders": 4
+        },
+        {
+          "city": "Lviv",
+          "delivered_orders": 28,
+          "cancelled_orders": 7
+        },
+        {
+          "city": "Odesa",
+          "delivered_orders": 9,
+          "cancelled_orders": 3
+        },
+        {
+          "city": "Poltava",
+          "delivered_orders": 11,
+          "cancelled_orders": 2
+        },
+        {
+          "city": "Vinnytsia",
+          "delivered_orders": 8,
+          "cancelled_orders": 2
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT cu.city, COUNT(*) AS delivered_orders, COUNT(*) AS cancelled_orders\n              FROM customers cu JOIN orders o ON o.customer_id = cu.customer_id GROUP BY cu.city"
+      ]
+    },
+    {
+      "id": "v4_090",
+      "question": "For each shipping carrier, show the carrier, the number of delivered shipments and the number of shipments with status 'in_transit'.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT carrier,\n              SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) AS delivered_shipments,\n              SUM(CASE WHEN status = 'in_transit' THEN 1 ELSE 0 END) AS in_transit_shipments\n       FROM shipments GROUP BY carrier",
+      "expected_columns": [
+        "carrier",
+        "delivered_shipments",
+        "in_transit_shipments"
+      ],
+      "expected_result": [
+        {
+          "carrier": "Meest",
+          "delivered_shipments": 61,
+          "in_transit_shipments": 12
+        },
+        {
+          "carrier": "Nova Post",
+          "delivered_shipments": 41,
+          "in_transit_shipments": 8
+        },
+        {
+          "carrier": "Ukrposhta",
+          "delivered_shipments": 37,
+          "in_transit_shipments": 11
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT carrier,\n                     SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) AS delivered_shipments,\n                     SUM(CASE WHEN status = 'shipped' THEN 1 ELSE 0 END) AS in_transit_shipments\n              FROM shipments GROUP BY carrier"
+      ]
+    },
+    {
+      "id": "v4_091",
+      "question": "For each supplier country, show the country, the number of products priced above 149000 cents and the number priced at or below 149000 cents.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT s.country,\n              SUM(CASE WHEN p.price_cents > 149000 THEN 1 ELSE 0 END) AS expensive_products,\n              SUM(CASE WHEN p.price_cents <= 149000 THEN 1 ELSE 0 END) AS other_products\n       FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id GROUP BY s.country",
+      "expected_columns": [
+        "country",
+        "expensive_products",
+        "other_products"
+      ],
+      "expected_result": [
+        {
+          "country": "Czechia",
+          "expensive_products": 5,
+          "other_products": 8
+        },
+        {
+          "country": "Germany",
+          "expensive_products": 9,
+          "other_products": 5
+        },
+        {
+          "country": "Poland",
+          "expensive_products": 9,
+          "other_products": 11
+        },
+        {
+          "country": "Taiwan",
+          "expensive_products": 14,
+          "other_products": 13
+        },
+        {
+          "country": "Ukraine",
+          "expensive_products": 4,
+          "other_products": 2
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT s.country,\n                     SUM(CASE WHEN p.price_cents >= 149000 THEN 1 ELSE 0 END) AS expensive_products,\n                     SUM(CASE WHEN p.price_cents < 149000 THEN 1 ELSE 0 END) AS other_products\n              FROM suppliers s JOIN products p ON p.supplier_id = s.supplier_id GROUP BY s.country"
+      ]
+    },
+    {
+      "id": "v4_092",
+      "question": "For each order status, show the status, the number of orders that used a coupon and the number of orders without a coupon.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT status,\n              SUM(CASE WHEN coupon_id IS NOT NULL THEN 1 ELSE 0 END) AS with_coupon,\n              SUM(CASE WHEN coupon_id IS NULL THEN 1 ELSE 0 END) AS without_coupon\n       FROM orders GROUP BY status",
+      "expected_columns": [
+        "status",
+        "with_coupon",
+        "without_coupon"
+      ],
+      "expected_result": [
+        {
+          "status": "cancelled",
+          "with_coupon": 2,
+          "without_coupon": 27
+        },
+        {
+          "status": "delivered",
+          "with_coupon": 18,
+          "without_coupon": 107
+        },
+        {
+          "status": "pending",
+          "with_coupon": 2,
+          "without_coupon": 19
+        },
+        {
+          "status": "processing",
+          "with_coupon": 4,
+          "without_coupon": 39
+        },
+        {
+          "status": "returned",
+          "with_coupon": 0,
+          "without_coupon": 14
+        },
+        {
+          "status": "shipped",
+          "with_coupon": 11,
+          "without_coupon": 57
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT status, COUNT(coupon_id) AS with_coupon, COUNT(*) AS without_coupon FROM orders GROUP BY status"
+      ]
+    },
+    {
+      "id": "v4_093",
+      "question": "What percentage of all orders have the status 'delivered'? Show the percentage rounded to two decimals as delivered_percent.",
+      "category": "conditional_aggregation",
+      "reference_sql": "SELECT ROUND(100.0 * SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) / COUNT(*), 2) AS delivered_percent FROM orders",
+      "expected_columns": [
+        "delivered_percent"
+      ],
+      "expected_result": [
+        {
+          "delivered_percent": 41.67
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT 100 * SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) / COUNT(*) AS delivered_percent FROM orders"
+      ]
+    },
+    {
+      "id": "v4_094",
+      "question": "For each category, which product has the largest stock quantity? Show the category name, the product name and the stock quantity. If several products share the maximum, show all of them.",
+      "category": "ranking",
+      "reference_sql": "SELECT c.name AS category_name, p.name AS product_name, p.stock_quantity FROM products p\n       JOIN categories c ON c.category_id = p.category_id\n       WHERE p.stock_quantity = (SELECT MAX(p2.stock_quantity) FROM products p2 WHERE p2.category_id = p.category_id)",
+      "expected_columns": [
+        "category_name",
+        "product_name",
+        "stock_quantity"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Networking Equipment",
+          "product_name": "Hyper Elite 07",
+          "stock_quantity": 73
+        },
+        {
+          "category_name": "Accessories",
+          "product_name": "Vector Max 24",
+          "stock_quantity": 91
+        },
+        {
+          "category_name": "Smartphones",
+          "product_name": "Nova Ultra 26",
+          "stock_quantity": 99
+        },
+        {
+          "category_name": "Audio",
+          "product_name": "Aero Plus 30",
+          "stock_quantity": 96
+        },
+        {
+          "category_name": "Laptops",
+          "product_name": "Vertex Core 33",
+          "stock_quantity": 98
+        },
+        {
+          "category_name": "Monitors",
+          "product_name": "Zenith Core 59",
+          "stock_quantity": 98
+        },
+        {
+          "category_name": "Components",
+          "product_name": "Quantum Ultra 60",
+          "stock_quantity": 99
+        },
+        {
+          "category_name": "Peripherals",
+          "product_name": "Aero Core 69",
+          "stock_quantity": 78
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, p.name AS product_name, p.stock_quantity FROM products p\n              JOIN categories c ON c.category_id = p.category_id\n              WHERE p.stock_quantity = (SELECT MAX(stock_quantity) FROM products)"
+      ]
+    },
+    {
+      "id": "v4_095",
+      "question": "For each customer from 'Odesa' who has placed orders, show the full name and the number of orders, sorted by the number of orders in descending order and then by full name.",
+      "category": "ranking",
+      "reference_sql": "SELECT cu.full_name, COUNT(*) AS order_count FROM customers cu\n       JOIN orders o ON o.customer_id = cu.customer_id WHERE cu.city = 'Odesa'\n       GROUP BY cu.customer_id, cu.full_name ORDER BY order_count DESC, cu.full_name",
+      "expected_columns": [
+        "full_name",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Maksym Bondarenko",
+          "order_count": 7
+        },
+        {
+          "full_name": "Viktoria Melnyk",
+          "order_count": 6
+        },
+        {
+          "full_name": "Anna Melnyk",
+          "order_count": 3
+        },
+        {
+          "full_name": "Oleksandr Bondarenko",
+          "order_count": 3
+        }
+      ],
+      "order_key": [
+        "full_name"
+      ],
+      "order_sensitive": true,
+      "common_wrong_sql": [
+        "SELECT cu.full_name, COUNT(*) AS order_count FROM customers cu\n              JOIN orders o ON o.customer_id = cu.customer_id WHERE cu.city = 'Odesa'\n              GROUP BY cu.customer_id, cu.full_name ORDER BY order_count ASC, cu.full_name"
+      ]
+    },
+    {
+      "id": "v4_096",
+      "question": "For each category, what share of its products is active? Show the category name and the percentage rounded to two decimals as active_percent.",
+      "category": "ranking",
+      "reference_sql": "SELECT c.name AS category_name, ROUND(100.0 * SUM(p.is_active) / COUNT(*), 2) AS active_percent\n       FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "active_percent"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Smartphones",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Monitors",
+          "active_percent": 100.0
+        },
+        {
+          "category_name": "Components",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Peripherals",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Audio",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Networking Equipment",
+          "active_percent": 90.0
+        },
+        {
+          "category_name": "Accessories",
+          "active_percent": 100.0
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, ROUND(100.0 * SUM(p.is_active) / (SELECT COUNT(*) FROM products), 2) AS active_percent\n              FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_097",
+      "question": "For each category, show the category name and the difference in cents between the maximum and the minimum product price in it.",
+      "category": "ranking",
+      "reference_sql": "SELECT c.name AS category_name, MAX(p.price_cents) - MIN(p.price_cents) AS price_spread_cents\n       FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name",
+      "expected_columns": [
+        "category_name",
+        "price_spread_cents"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "price_spread_cents": 214300
+        },
+        {
+          "category_name": "Smartphones",
+          "price_spread_cents": 224100
+        },
+        {
+          "category_name": "Monitors",
+          "price_spread_cents": 188100
+        },
+        {
+          "category_name": "Components",
+          "price_spread_cents": 173200
+        },
+        {
+          "category_name": "Peripherals",
+          "price_spread_cents": 151100
+        },
+        {
+          "category_name": "Audio",
+          "price_spread_cents": 209900
+        },
+        {
+          "category_name": "Networking Equipment",
+          "price_spread_cents": 161400
+        },
+        {
+          "category_name": "Accessories",
+          "price_spread_cents": 218600
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT c.name AS category_name, MAX(p.price_cents) AS price_spread_cents\n              FROM categories c JOIN products p ON p.category_id = c.category_id GROUP BY c.category_id, c.name"
+      ]
+    },
+    {
+      "id": "v4_098",
+      "question": "Which customers have an email address that starts with 'customer9'? Show the full name and the email address.",
+      "category": "filtering",
+      "reference_sql": "SELECT full_name, email FROM customers WHERE email LIKE 'customer9%'",
+      "expected_columns": [
+        "full_name",
+        "email"
+      ],
+      "expected_result": [
+        {
+          "full_name": "Dmytro Melnyk",
+          "email": "customer9@example.com"
+        },
+        {
+          "full_name": "Oleksandr Bondarenko",
+          "email": "customer90@example.com"
+        },
+        {
+          "full_name": "Oleksandr Kovalenko",
+          "email": "customer91@example.com"
+        },
+        {
+          "full_name": "Nikita Shevchenko",
+          "email": "customer92@example.com"
+        },
+        {
+          "full_name": "Ivan Oliinyk",
+          "email": "customer93@example.com"
+        },
+        {
+          "full_name": "Maria Tkachenko",
+          "email": "customer94@example.com"
+        },
+        {
+          "full_name": "Daria Boiko",
+          "email": "customer95@example.com"
+        },
+        {
+          "full_name": "Dmytro Kovalenko",
+          "email": "customer96@example.com"
+        },
+        {
+          "full_name": "Oleksandr Kravchenko",
+          "email": "customer97@example.com"
+        },
+        {
+          "full_name": "Anna Bondarenko",
+          "email": "customer98@example.com"
+        },
+        {
+          "full_name": "Artem Moroz",
+          "email": "customer99@example.com"
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT full_name, email FROM customers WHERE email LIKE 'customer9@%'"
+      ]
+    },
+    {
+      "id": "v4_099",
+      "question": "For products that have at least three reviews, show the product name and the number of reviews.",
+      "category": "joins",
+      "reference_sql": "SELECT p.name, COUNT(*) AS review_count FROM products p JOIN reviews r ON r.product_id = p.product_id\n       GROUP BY p.product_id, p.name HAVING COUNT(*) >= 3",
+      "expected_columns": [
+        "name",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "name": "Pulse Plus 02",
+          "review_count": 4
+        },
+        {
+          "name": "Nova Ultra 05",
+          "review_count": 3
+        },
+        {
+          "name": "Titan Plus 06",
+          "review_count": 3
+        },
+        {
+          "name": "Pulse Pro 08",
+          "review_count": 4
+        },
+        {
+          "name": "Aero Air 13",
+          "review_count": 3
+        },
+        {
+          "name": "Zenith Max 18",
+          "review_count": 6
+        },
+        {
+          "name": "Pulse Max 21",
+          "review_count": 3
+        },
+        {
+          "name": "Zenith Elite 25",
+          "review_count": 4
+        },
+        {
+          "name": "Zenith Pro 28",
+          "review_count": 3
+        },
+        {
+          "name": "Aero Plus 30",
+          "review_count": 4
+        },
+        {
+          "name": "Vertex Core 33",
+          "review_count": 3
+        },
+        {
+          "name": "Zenith Max 34",
+          "review_count": 3
+        },
+        {
+          "name": "Hyper Core 35",
+          "review_count": 3
+        },
+        {
+          "name": "Quantum Air 37",
+          "review_count": 3
+        },
+        {
+          "name": "Orbit Plus 39",
+          "review_count": 3
+        },
+        {
+          "name": "Orbit Pro 41",
+          "review_count": 3
+        },
+        {
+          "name": "Orbit X 42",
+          "review_count": 4
+        },
+        {
+          "name": "Pulse Elite 45",
+          "review_count": 5
+        },
+        {
+          "name": "Quantum X 47",
+          "review_count": 3
+        },
+        {
+          "name": "Nova Elite 48",
+          "review_count": 3
+        },
+        {
+          "name": "Quantum X 50",
+          "review_count": 4
+        },
+        {
+          "name": "Pulse Elite 51",
+          "review_count": 5
+        },
+        {
+          "name": "Zenith Plus 52",
+          "review_count": 3
+        },
+        {
+          "name": "Pulse Elite 53",
+          "review_count": 4
+        },
+        {
+          "name": "Nova Pro 56",
+          "review_count": 3
+        },
+        {
+          "name": "Nova Air 57",
+          "review_count": 4
+        },
+        {
+          "name": "Zenith Ultra 58",
+          "review_count": 4
+        },
+        {
+          "name": "Zenith Core 59",
+          "review_count": 3
+        },
+        {
+          "name": "Pulse Ultra 61",
+          "review_count": 4
+        },
+        {
+          "name": "Hyper Max 63",
+          "review_count": 5
+        },
+        {
+          "name": "Vector Ultra 64",
+          "review_count": 3
+        },
+        {
+          "name": "Titan Elite 65",
+          "review_count": 3
+        },
+        {
+          "name": "Zenith Air 68",
+          "review_count": 3
+        },
+        {
+          "name": "Aero Core 69",
+          "review_count": 6
+        },
+        {
+          "name": "Pulse Plus 71",
+          "review_count": 4
+        },
+        {
+          "name": "Pulse X 72",
+          "review_count": 4
+        },
+        {
+          "name": "Zenith Plus 74",
+          "review_count": 4
+        },
+        {
+          "name": "Aero Max 77",
+          "review_count": 8
+        },
+        {
+          "name": "Orbit X 78",
+          "review_count": 3
+        },
+        {
+          "name": "Zenith X 79",
+          "review_count": 3
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT p.name, COUNT(*) AS review_count FROM products p JOIN reviews r ON r.product_id = p.product_id\n              GROUP BY p.product_id, p.name"
+      ]
+    },
+    {
+      "id": "v4_100",
+      "question": "What is the average quantity per order item row across all order items, rounded to two decimals? Show the value as avg_quantity.",
+      "category": "aggregation",
+      "reference_sql": "SELECT ROUND(AVG(quantity), 2) AS avg_quantity FROM order_items",
+      "expected_columns": [
+        "avg_quantity"
+      ],
+      "expected_result": [
+        {
+          "avg_quantity": 2.0
+        }
+      ],
+      "order_sensitive": false,
+      "common_wrong_sql": [
+        "SELECT ROUND(AVG(total_quantity), 2) AS avg_quantity\n              FROM (SELECT SUM(quantity) AS total_quantity FROM order_items GROUP BY order_id)"
+      ]
+    }
+  ]
+}

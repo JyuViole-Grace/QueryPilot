@@ -1,0 +1,1410 @@
+{
+  "project": "QueryPilot",
+  "version": 2,
+  "database": "SQLite",
+  "language": "en",
+  "test_count": 30,
+  "tests": [
+    {
+      "id": "q01",
+      "question": "Which active products cost less than 500 UAH? Show the first 10.",
+      "category": "filtering",
+      "reference_sql": "SELECT product_id, name, price_cents\n            FROM products\n            WHERE is_active = 1 AND price_cents < 50000\n            ORDER BY price_cents, product_id\n            LIMIT 10",
+      "expected_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "product_id": 16,
+          "name": "Pulse Core 16",
+          "price_cents": 5100
+        },
+        {
+          "product_id": 77,
+          "name": "Aero Max 77",
+          "price_cents": 9100
+        },
+        {
+          "product_id": 80,
+          "name": "Hyper Core 80",
+          "price_cents": 12000
+        },
+        {
+          "product_id": 62,
+          "name": "Pulse Elite 62",
+          "price_cents": 15500
+        },
+        {
+          "product_id": 74,
+          "name": "Zenith Plus 74",
+          "price_cents": 16700
+        },
+        {
+          "product_id": 46,
+          "name": "Orbit Plus 46",
+          "price_cents": 16800
+        },
+        {
+          "product_id": 51,
+          "name": "Pulse Elite 51",
+          "price_cents": 25500
+        },
+        {
+          "product_id": 56,
+          "name": "Nova Pro 56",
+          "price_cents": 33100
+        },
+        {
+          "product_id": 2,
+          "name": "Pulse Plus 02",
+          "price_cents": 33400
+        },
+        {
+          "product_id": 37,
+          "name": "Quantum Air 37",
+          "price_cents": 38000
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q02",
+      "question": "How many customers live in each city?",
+      "category": "aggregation",
+      "reference_sql": "SELECT city, COUNT(*) AS customer_count\n            FROM customers\n            GROUP BY city\n            ORDER BY customer_count DESC, city",
+      "expected_columns": [
+        "city",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "city": "Lviv",
+          "customer_count": 19
+        },
+        {
+          "city": "Kharkiv",
+          "customer_count": 16
+        },
+        {
+          "city": "Dnipro",
+          "customer_count": 15
+        },
+        {
+          "city": "Kyiv",
+          "customer_count": 14
+        },
+        {
+          "city": "Cherkasy",
+          "customer_count": 12
+        },
+        {
+          "city": "Poltava",
+          "customer_count": 9
+        },
+        {
+          "city": "Vinnytsia",
+          "customer_count": 8
+        },
+        {
+          "city": "Odesa",
+          "customer_count": 7
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q03",
+      "question": "How many customers have not placed any orders?",
+      "category": "joins",
+      "reference_sql": "SELECT COUNT(*) AS customers_without_orders\n            FROM customers AS c\n            WHERE NOT EXISTS (\n                SELECT 1\n                FROM orders AS o\n                WHERE o.customer_id = c.customer_id\n            )",
+      "expected_columns": [
+        "customers_without_orders"
+      ],
+      "expected_result": [
+        {
+          "customers_without_orders": 17
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q04",
+      "question": "How many products have never appeared in any order?",
+      "category": "subqueries",
+      "reference_sql": "SELECT COUNT(*) AS products_never_ordered\n            FROM products AS p\n            WHERE NOT EXISTS (\n                SELECT 1\n                FROM order_items AS oi\n                WHERE oi.product_id = p.product_id\n            )",
+      "expected_columns": [
+        "products_never_ordered"
+      ],
+      "expected_result": [
+        {
+          "products_never_ordered": 2
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q05",
+      "question": "Which products have not been sold in delivered orders?",
+      "category": "subqueries",
+      "reference_sql": "SELECT p.product_id, p.name\n            FROM products AS p\n            WHERE NOT EXISTS (\n                SELECT 1\n                FROM order_items AS oi\n                JOIN orders AS o ON o.order_id = oi.order_id\n                WHERE oi.product_id = p.product_id\n                  AND o.status = 'delivered'\n            )\n            ORDER BY p.product_id",
+      "expected_columns": [
+        "product_id",
+        "name"
+      ],
+      "expected_result": [
+        {
+          "product_id": 28,
+          "name": "Zenith Pro 28"
+        },
+        {
+          "product_id": 79,
+          "name": "Zenith X 79"
+        },
+        {
+          "product_id": 80,
+          "name": "Hyper Core 80"
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q06",
+      "question": "Show the 10 most expensive products, with their names and prices.",
+      "category": "sorting",
+      "reference_sql": "SELECT product_id, name, price_cents\n            FROM products\n            ORDER BY price_cents DESC, product_id\n            LIMIT 10",
+      "expected_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "expected_result": [
+        {
+          "product_id": 71,
+          "name": "Pulse Plus 71",
+          "price_cents": 247600
+        },
+        {
+          "product_id": 42,
+          "name": "Orbit X 42",
+          "price_cents": 240800
+        },
+        {
+          "product_id": 15,
+          "name": "Pulse Elite 15",
+          "price_cents": 238100
+        },
+        {
+          "product_id": 49,
+          "name": "Nova Ultra 49",
+          "price_cents": 236100
+        },
+        {
+          "product_id": 55,
+          "name": "Nova Plus 55",
+          "price_cents": 225900
+        },
+        {
+          "product_id": 44,
+          "name": "Aero Max 44",
+          "price_cents": 225400
+        },
+        {
+          "product_id": 70,
+          "name": "Zenith X 70",
+          "price_cents": 225400
+        },
+        {
+          "product_id": 48,
+          "name": "Nova Elite 48",
+          "price_cents": 223700
+        },
+        {
+          "product_id": 34,
+          "name": "Zenith Max 34",
+          "price_cents": 218500
+        },
+        {
+          "product_id": 28,
+          "name": "Zenith Pro 28",
+          "price_cents": 217100
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q07",
+      "question": "How many orders are there for each status?",
+      "category": "aggregation",
+      "reference_sql": "SELECT status, COUNT(*) AS order_count\n            FROM orders\n            GROUP BY status\n            ORDER BY status",
+      "expected_columns": [
+        "status",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "status": "cancelled",
+          "order_count": 29
+        },
+        {
+          "status": "delivered",
+          "order_count": 125
+        },
+        {
+          "status": "pending",
+          "order_count": 21
+        },
+        {
+          "status": "processing",
+          "order_count": 43
+        },
+        {
+          "status": "returned",
+          "order_count": 14
+        },
+        {
+          "status": "shipped",
+          "order_count": 68
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q08",
+      "question": "What is the monthly revenue from delivered orders after discounts?",
+      "category": "aggregation",
+      "reference_sql": "SELECT\n                substr(o.ordered_at, 1, 7) AS month,\n                SUM(\n                    order_totals.item_total - o.discount_cents\n                ) AS revenue_cents\n            FROM orders AS o\n            JOIN (\n                SELECT\n                    order_id,\n                    SUM(quantity * unit_price_cents) AS item_total\n                FROM order_items\n                GROUP BY order_id\n            ) AS order_totals ON order_totals.order_id = o.order_id\n            WHERE o.status = 'delivered'\n            GROUP BY substr(o.ordered_at, 1, 7)\n            ORDER BY month",
+      "expected_columns": [
+        "month",
+        "revenue_cents"
+      ],
+      "expected_result": [
+        {
+          "month": "2025-01",
+          "revenue_cents": 2024486
+        },
+        {
+          "month": "2025-02",
+          "revenue_cents": 3712239
+        },
+        {
+          "month": "2025-03",
+          "revenue_cents": 2375460
+        },
+        {
+          "month": "2025-04",
+          "revenue_cents": 5026535
+        },
+        {
+          "month": "2025-05",
+          "revenue_cents": 5155243
+        },
+        {
+          "month": "2025-06",
+          "revenue_cents": 4295058
+        },
+        {
+          "month": "2025-07",
+          "revenue_cents": 663188
+        },
+        {
+          "month": "2025-08",
+          "revenue_cents": 2106492
+        },
+        {
+          "month": "2025-09",
+          "revenue_cents": 817550
+        },
+        {
+          "month": "2025-10",
+          "revenue_cents": 4706133
+        },
+        {
+          "month": "2025-11",
+          "revenue_cents": 10175923
+        },
+        {
+          "month": "2025-12",
+          "revenue_cents": 4606338
+        },
+        {
+          "month": "2026-01",
+          "revenue_cents": 5600786
+        },
+        {
+          "month": "2026-02",
+          "revenue_cents": 4274456
+        },
+        {
+          "month": "2026-03",
+          "revenue_cents": 6843096
+        },
+        {
+          "month": "2026-04",
+          "revenue_cents": 7594598
+        },
+        {
+          "month": "2026-05",
+          "revenue_cents": 6633578
+        },
+        {
+          "month": "2026-06",
+          "revenue_cents": 4286501
+        },
+        {
+          "month": "2026-07",
+          "revenue_cents": 4691227
+        },
+        {
+          "month": "2026-08",
+          "revenue_cents": 1861895
+        },
+        {
+          "month": "2026-09",
+          "revenue_cents": 3696269
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q09",
+      "question": "Which categories have the highest gross value of products sold in delivered orders before discounts? Show all categories.",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT\n                c.name AS category_name,\n                SUM(oi.quantity * oi.unit_price_cents) AS gross_sales_cents\n            FROM categories AS c\n            JOIN products AS p ON p.category_id = c.category_id\n            JOIN order_items AS oi ON oi.product_id = p.product_id\n            JOIN orders AS o ON o.order_id = oi.order_id\n            WHERE o.status = 'delivered'\n            GROUP BY c.category_id, c.name\n            ORDER BY gross_sales_cents DESC, c.name",
+      "expected_columns": [
+        "category_name",
+        "gross_sales_cents"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Networking Equipment",
+          "gross_sales_cents": 20650412
+        },
+        {
+          "category_name": "Smartphones",
+          "gross_sales_cents": 15352603
+        },
+        {
+          "category_name": "Monitors",
+          "gross_sales_cents": 13234324
+        },
+        {
+          "category_name": "Laptops",
+          "gross_sales_cents": 10952859
+        },
+        {
+          "category_name": "Components",
+          "gross_sales_cents": 9805806
+        },
+        {
+          "category_name": "Accessories",
+          "gross_sales_cents": 8799881
+        },
+        {
+          "category_name": "Peripherals",
+          "gross_sales_cents": 8164986
+        },
+        {
+          "category_name": "Audio",
+          "gross_sales_cents": 5376187
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q10",
+      "question": "Show the 10 products with the highest average rating, considering only products with at least five reviews.",
+      "category": "aggregation",
+      "reference_sql": "SELECT\n                p.product_id,\n                p.name,\n                ROUND(AVG(r.rating), 2) AS average_rating,\n                COUNT(*) AS review_count\n            FROM products AS p\n            JOIN reviews AS r ON r.product_id = p.product_id\n            GROUP BY p.product_id, p.name\n            HAVING COUNT(*) >= 5\n            ORDER BY average_rating DESC, review_count DESC, p.product_id\n            LIMIT 10",
+      "expected_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "product_id": 45,
+          "name": "Pulse Elite 45",
+          "average_rating": 4.6,
+          "review_count": 5
+        },
+        {
+          "product_id": 18,
+          "name": "Zenith Max 18",
+          "average_rating": 4.17,
+          "review_count": 6
+        },
+        {
+          "product_id": 77,
+          "name": "Aero Max 77",
+          "average_rating": 4.0,
+          "review_count": 8
+        },
+        {
+          "product_id": 63,
+          "name": "Hyper Max 63",
+          "average_rating": 4.0,
+          "review_count": 5
+        },
+        {
+          "product_id": 51,
+          "name": "Pulse Elite 51",
+          "average_rating": 3.8,
+          "review_count": 5
+        },
+        {
+          "product_id": 69,
+          "name": "Aero Core 69",
+          "average_rating": 3.33,
+          "review_count": 6
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q11",
+      "question": "Which customers have placed more than three orders? Show the first 10, ordered by order count.",
+      "category": "aggregation",
+      "reference_sql": "SELECT\n                c.customer_id,\n                c.full_name,\n                COUNT(o.order_id) AS order_count\n            FROM customers AS c\n            JOIN orders AS o ON o.customer_id = c.customer_id\n            GROUP BY c.customer_id, c.full_name\n            HAVING COUNT(o.order_id) > 3\n            ORDER BY order_count DESC, c.customer_id\n            LIMIT 10",
+      "expected_columns": [
+        "customer_id",
+        "full_name",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "customer_id": 19,
+          "full_name": "Maksym Bondarenko",
+          "order_count": 7
+        },
+        {
+          "customer_id": 63,
+          "full_name": "Maria Kovalenko",
+          "order_count": 7
+        },
+        {
+          "customer_id": 68,
+          "full_name": "Viktoria Boiko",
+          "order_count": 7
+        },
+        {
+          "customer_id": 70,
+          "full_name": "Daria Boiko",
+          "order_count": 7
+        },
+        {
+          "customer_id": 74,
+          "full_name": "Maria Melnyk",
+          "order_count": 7
+        },
+        {
+          "customer_id": 5,
+          "full_name": "Anna Melnyk",
+          "order_count": 6
+        },
+        {
+          "customer_id": 15,
+          "full_name": "Maria Kovalenko",
+          "order_count": 6
+        },
+        {
+          "customer_id": 20,
+          "full_name": "Viktoria Melnyk",
+          "order_count": 6
+        },
+        {
+          "customer_id": 29,
+          "full_name": "Anna Tkachenko",
+          "order_count": 6
+        },
+        {
+          "customer_id": 31,
+          "full_name": "Dmytro Oliinyk",
+          "order_count": 6
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q12",
+      "question": "Show the 10 most expensive orders after discounts are applied.",
+      "category": "subqueries",
+      "reference_sql": "SELECT\n                o.order_id,\n                o.status,\n                (\n                    SELECT SUM(oi.quantity * oi.unit_price_cents)\n                    FROM order_items AS oi\n                    WHERE oi.order_id = o.order_id\n                ) - o.discount_cents AS total_cents\n            FROM orders AS o\n            ORDER BY total_cents DESC, o.order_id\n            LIMIT 10",
+      "expected_columns": [
+        "order_id",
+        "status",
+        "total_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 219,
+          "status": "processing",
+          "total_cents": 1985913
+        },
+        {
+          "order_id": 82,
+          "status": "delivered",
+          "total_cents": 1877836
+        },
+        {
+          "order_id": 243,
+          "status": "delivered",
+          "total_cents": 1853738
+        },
+        {
+          "order_id": 20,
+          "status": "delivered",
+          "total_cents": 1783725
+        },
+        {
+          "order_id": 108,
+          "status": "returned",
+          "total_cents": 1724646
+        },
+        {
+          "order_id": 55,
+          "status": "delivered",
+          "total_cents": 1687561
+        },
+        {
+          "order_id": 27,
+          "status": "delivered",
+          "total_cents": 1673322
+        },
+        {
+          "order_id": 163,
+          "status": "delivered",
+          "total_cents": 1669296
+        },
+        {
+          "order_id": 140,
+          "status": "delivered",
+          "total_cents": 1664187
+        },
+        {
+          "order_id": 143,
+          "status": "pending",
+          "total_cents": 1555365
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q13",
+      "question": "How many orders used each coupon? Also show coupons that were never used.",
+      "category": "joins",
+      "reference_sql": "SELECT\n                c.coupon_id,\n                c.code,\n                COUNT(o.order_id) AS usage_count\n            FROM coupons AS c\n            LEFT JOIN orders AS o ON o.coupon_id = c.coupon_id\n            GROUP BY c.coupon_id, c.code\n            ORDER BY usage_count DESC, c.coupon_id",
+      "expected_columns": [
+        "coupon_id",
+        "code",
+        "usage_count"
+      ],
+      "expected_result": [
+        {
+          "coupon_id": 2,
+          "code": "SALE02",
+          "usage_count": 9
+        },
+        {
+          "coupon_id": 3,
+          "code": "SALE03",
+          "usage_count": 6
+        },
+        {
+          "coupon_id": 7,
+          "code": "SALE07",
+          "usage_count": 6
+        },
+        {
+          "coupon_id": 1,
+          "code": "SALE01",
+          "usage_count": 5
+        },
+        {
+          "coupon_id": 4,
+          "code": "SALE04",
+          "usage_count": 5
+        },
+        {
+          "coupon_id": 5,
+          "code": "SALE05",
+          "usage_count": 3
+        },
+        {
+          "coupon_id": 6,
+          "code": "SALE06",
+          "usage_count": 3
+        },
+        {
+          "coupon_id": 8,
+          "code": "SALE08",
+          "usage_count": 0
+        },
+        {
+          "coupon_id": 9,
+          "code": "SALE09",
+          "usage_count": 0
+        },
+        {
+          "coupon_id": 10,
+          "code": "SALE10",
+          "usage_count": 0
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q14",
+      "question": "How many orders have no payment record?",
+      "category": "subqueries",
+      "reference_sql": "SELECT COUNT(*) AS orders_without_payments\n            FROM orders AS o\n            WHERE NOT EXISTS (\n                SELECT 1\n                FROM payments AS p\n                WHERE p.order_id = o.order_id\n            )",
+      "expected_columns": [
+        "orders_without_payments"
+      ],
+      "expected_result": [
+        {
+          "orders_without_payments": 26
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q15",
+      "question": "What is the total amount of successful payments by month?",
+      "category": "aggregation",
+      "reference_sql": "SELECT\n                substr(p.paid_at, 1, 7) AS month,\n                SUM(p.amount_cents) AS successful_amount_cents\n            FROM payments AS p\n            WHERE p.status = 'successful'\n              AND p.paid_at IS NOT NULL\n            GROUP BY substr(p.paid_at, 1, 7)\n            ORDER BY month",
+      "expected_columns": [
+        "month",
+        "successful_amount_cents"
+      ],
+      "expected_result": [
+        {
+          "month": "2025-01",
+          "successful_amount_cents": 3469992
+        },
+        {
+          "month": "2025-02",
+          "successful_amount_cents": 7985691
+        },
+        {
+          "month": "2025-03",
+          "successful_amount_cents": 6725159
+        },
+        {
+          "month": "2025-04",
+          "successful_amount_cents": 8906958
+        },
+        {
+          "month": "2025-05",
+          "successful_amount_cents": 9720730
+        },
+        {
+          "month": "2025-06",
+          "successful_amount_cents": 8447957
+        },
+        {
+          "month": "2025-07",
+          "successful_amount_cents": 2431978
+        },
+        {
+          "month": "2025-08",
+          "successful_amount_cents": 5911001
+        },
+        {
+          "month": "2025-09",
+          "successful_amount_cents": 3021092
+        },
+        {
+          "month": "2025-10",
+          "successful_amount_cents": 7298391
+        },
+        {
+          "month": "2025-11",
+          "successful_amount_cents": 12104670
+        },
+        {
+          "month": "2025-12",
+          "successful_amount_cents": 6340731
+        },
+        {
+          "month": "2026-01",
+          "successful_amount_cents": 9286955
+        },
+        {
+          "month": "2026-02",
+          "successful_amount_cents": 8202368
+        },
+        {
+          "month": "2026-03",
+          "successful_amount_cents": 10537265
+        },
+        {
+          "month": "2026-04",
+          "successful_amount_cents": 10326888
+        },
+        {
+          "month": "2026-05",
+          "successful_amount_cents": 7206382
+        },
+        {
+          "month": "2026-06",
+          "successful_amount_cents": 5781230
+        },
+        {
+          "month": "2026-07",
+          "successful_amount_cents": 10700331
+        },
+        {
+          "month": "2026-08",
+          "successful_amount_cents": 4668238
+        },
+        {
+          "month": "2026-09",
+          "successful_amount_cents": 8457091
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q16",
+      "question": "How many products does each supplier provide, including suppliers with no products?",
+      "category": "joins",
+      "reference_sql": "SELECT\n                s.supplier_id,\n                s.name AS supplier_name,\n                COUNT(p.product_id) AS product_count\n            FROM suppliers AS s\n            LEFT JOIN products AS p ON p.supplier_id = s.supplier_id\n            GROUP BY s.supplier_id, s.name\n            ORDER BY product_count DESC, s.supplier_id",
+      "expected_columns": [
+        "supplier_id",
+        "supplier_name",
+        "product_count"
+      ],
+      "expected_result": [
+        {
+          "supplier_id": 1,
+          "supplier_name": "TechNova",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 2,
+          "supplier_name": "DigitalCore",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 3,
+          "supplier_name": "NextWave",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 4,
+          "supplier_name": "ElectroHub",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 5,
+          "supplier_name": "SmartSupply",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 6,
+          "supplier_name": "ByteWorks",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 7,
+          "supplier_name": "GlobalTech",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 8,
+          "supplier_name": "NovaParts",
+          "product_count": 7
+        },
+        {
+          "supplier_id": 9,
+          "supplier_name": "DeviceWorld",
+          "product_count": 6
+        },
+        {
+          "supplier_id": 10,
+          "supplier_name": "PrimeSystems",
+          "product_count": 6
+        },
+        {
+          "supplier_id": 11,
+          "supplier_name": "MegaElectro",
+          "product_count": 6
+        },
+        {
+          "supplier_id": 12,
+          "supplier_name": "FutureGear",
+          "product_count": 6
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q17",
+      "question": "How many products currently have zero stock?",
+      "category": "filtering",
+      "reference_sql": "SELECT COUNT(*) AS out_of_stock_count\n            FROM products\n            WHERE stock_quantity = 0",
+      "expected_columns": [
+        "out_of_stock_count"
+      ],
+      "expected_result": [
+        {
+          "out_of_stock_count": 1
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q18",
+      "question": "How many reviews are there for each rating from 1 to 5?",
+      "category": "aggregation",
+      "reference_sql": "SELECT rating, COUNT(*) AS review_count\n            FROM reviews\n            GROUP BY rating\n            ORDER BY rating",
+      "expected_columns": [
+        "rating",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "rating": 1,
+          "review_count": 6
+        },
+        {
+          "rating": 2,
+          "review_count": 4
+        },
+        {
+          "rating": 3,
+          "review_count": 24
+        },
+        {
+          "rating": 4,
+          "review_count": 65
+        },
+        {
+          "rating": 5,
+          "review_count": 101
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q19",
+      "question": "Show the 10 most recently registered customers.",
+      "category": "sorting",
+      "reference_sql": "SELECT customer_id, full_name, city, registered_at\n            FROM customers\n            ORDER BY registered_at DESC, customer_id\n            LIMIT 10",
+      "expected_columns": [
+        "customer_id",
+        "full_name",
+        "city",
+        "registered_at"
+      ],
+      "expected_result": [
+        {
+          "customer_id": 14,
+          "full_name": "Daria Kravchenko",
+          "city": "Kharkiv",
+          "registered_at": "2024-12-22"
+        },
+        {
+          "customer_id": 88,
+          "full_name": "Anna Kravchenko",
+          "city": "Kharkiv",
+          "registered_at": "2024-12-04"
+        },
+        {
+          "customer_id": 21,
+          "full_name": "Artem Shevchenko",
+          "city": "Kharkiv",
+          "registered_at": "2024-12-02"
+        },
+        {
+          "customer_id": 97,
+          "full_name": "Oleksandr Kravchenko",
+          "city": "Kharkiv",
+          "registered_at": "2024-11-29"
+        },
+        {
+          "customer_id": 33,
+          "full_name": "Maksym Boiko",
+          "city": "Lviv",
+          "registered_at": "2024-11-27"
+        },
+        {
+          "customer_id": 57,
+          "full_name": "Artem Polishchuk",
+          "city": "Lviv",
+          "registered_at": "2024-11-20"
+        },
+        {
+          "customer_id": 18,
+          "full_name": "Sofia Kravchenko",
+          "city": "Kharkiv",
+          "registered_at": "2024-11-17"
+        },
+        {
+          "customer_id": 84,
+          "full_name": "Viktoria Shevchenko",
+          "city": "Lviv",
+          "registered_at": "2024-11-14"
+        },
+        {
+          "customer_id": 25,
+          "full_name": "Nikita Polishchuk",
+          "city": "Poltava",
+          "registered_at": "2024-10-20"
+        },
+        {
+          "customer_id": 34,
+          "full_name": "Viktoria Bondarenko",
+          "city": "Dnipro",
+          "registered_at": "2024-10-18"
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q20",
+      "question": "How many products are in each category?",
+      "category": "joins",
+      "reference_sql": "SELECT\n                c.name AS category_name,\n                COUNT(p.product_id) AS product_count\n            FROM categories AS c\n            LEFT JOIN products AS p ON p.category_id = c.category_id\n            GROUP BY c.category_id, c.name\n            ORDER BY c.category_id",
+      "expected_columns": [
+        "category_name",
+        "product_count"
+      ],
+      "expected_result": [
+        {
+          "category_name": "Laptops",
+          "product_count": 10
+        },
+        {
+          "category_name": "Smartphones",
+          "product_count": 10
+        },
+        {
+          "category_name": "Monitors",
+          "product_count": 10
+        },
+        {
+          "category_name": "Components",
+          "product_count": 10
+        },
+        {
+          "category_name": "Peripherals",
+          "product_count": 10
+        },
+        {
+          "category_name": "Audio",
+          "product_count": 10
+        },
+        {
+          "category_name": "Networking Equipment",
+          "product_count": 10
+        },
+        {
+          "category_name": "Accessories",
+          "product_count": 10
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q21",
+      "question": "Which five products were purchased in the largest quantities in delivered orders?",
+      "category": "multi_table_aggregation",
+      "reference_sql": "SELECT\n                p.product_id,\n                p.name,\n                SUM(oi.quantity) AS units_sold\n            FROM products AS p\n            JOIN order_items AS oi ON oi.product_id = p.product_id\n            JOIN orders AS o ON o.order_id = oi.order_id\n            WHERE o.status = 'delivered'\n            GROUP BY p.product_id, p.name\n            ORDER BY units_sold DESC, p.product_id\n            LIMIT 5",
+      "expected_columns": [
+        "product_id",
+        "name",
+        "units_sold"
+      ],
+      "expected_result": [
+        {
+          "product_id": 23,
+          "name": "Vector Ultra 23",
+          "units_sold": 22
+        },
+        {
+          "product_id": 66,
+          "name": "Hyper Plus 66",
+          "units_sold": 18
+        },
+        {
+          "product_id": 10,
+          "name": "Hyper Plus 10",
+          "units_sold": 17
+        },
+        {
+          "product_id": 18,
+          "name": "Zenith Max 18",
+          "units_sold": 17
+        },
+        {
+          "product_id": 75,
+          "name": "Vertex Plus 75",
+          "units_sold": 16
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q22",
+      "question": "Show the 10 most recent orders that used a coupon.",
+      "category": "joins",
+      "reference_sql": "SELECT\n                o.order_id,\n                o.ordered_at,\n                c.code AS coupon_code,\n                o.discount_cents\n            FROM orders AS o\n            JOIN coupons AS c ON c.coupon_id = o.coupon_id\n            ORDER BY o.ordered_at DESC, o.order_id DESC\n            LIMIT 10",
+      "expected_columns": [
+        "order_id",
+        "ordered_at",
+        "coupon_code",
+        "discount_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 100,
+          "ordered_at": "2025-12-27",
+          "coupon_code": "SALE07",
+          "discount_cents": 139553
+        },
+        {
+          "order_id": 165,
+          "ordered_at": "2025-12-26",
+          "coupon_code": "SALE07",
+          "discount_cents": 84145
+        },
+        {
+          "order_id": 14,
+          "ordered_at": "2025-12-15",
+          "coupon_code": "SALE07",
+          "discount_cents": 17955
+        },
+        {
+          "order_id": 210,
+          "ordered_at": "2025-12-04",
+          "coupon_code": "SALE07",
+          "discount_cents": 135069
+        },
+        {
+          "order_id": 94,
+          "ordered_at": "2025-11-06",
+          "coupon_code": "SALE07",
+          "discount_cents": 79850
+        },
+        {
+          "order_id": 200,
+          "ordered_at": "2025-10-21",
+          "coupon_code": "SALE05",
+          "discount_cents": 120732
+        },
+        {
+          "order_id": 234,
+          "ordered_at": "2025-10-19",
+          "coupon_code": "SALE05",
+          "discount_cents": 68286
+        },
+        {
+          "order_id": 122,
+          "ordered_at": "2025-10-14",
+          "coupon_code": "SALE06",
+          "discount_cents": 4659
+        },
+        {
+          "order_id": 164,
+          "ordered_at": "2025-10-01",
+          "coupon_code": "SALE06",
+          "discount_cents": 116945
+        },
+        {
+          "order_id": 232,
+          "ordered_at": "2025-09-14",
+          "coupon_code": "SALE07",
+          "discount_cents": 115491
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q23",
+      "question": "How many orders of each status were placed in 2026?",
+      "category": "date_filtering",
+      "reference_sql": "SELECT status, COUNT(*) AS order_count\n            FROM orders\n            WHERE ordered_at >= '2026-01-01'\n              AND ordered_at < '2027-01-01'\n            GROUP BY status\n            ORDER BY status",
+      "expected_columns": [
+        "status",
+        "order_count"
+      ],
+      "expected_result": [
+        {
+          "status": "cancelled",
+          "order_count": 14
+        },
+        {
+          "status": "delivered",
+          "order_count": 55
+        },
+        {
+          "status": "pending",
+          "order_count": 8
+        },
+        {
+          "status": "processing",
+          "order_count": 21
+        },
+        {
+          "status": "returned",
+          "order_count": 4
+        },
+        {
+          "status": "shipped",
+          "order_count": 25
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q24",
+      "question": "How many customers registered in each year?",
+      "category": "date_aggregation",
+      "reference_sql": "SELECT\n                substr(registered_at, 1, 4) AS registration_year,\n                COUNT(*) AS customer_count\n            FROM customers\n            GROUP BY substr(registered_at, 1, 4)\n            ORDER BY registration_year",
+      "expected_columns": [
+        "registration_year",
+        "customer_count"
+      ],
+      "expected_result": [
+        {
+          "registration_year": "2023",
+          "customer_count": 46
+        },
+        {
+          "registration_year": "2024",
+          "customer_count": 54
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q25",
+      "question": "Which products have an average rating above 4 and at least three reviews? Show the first 10.",
+      "category": "aggregation",
+      "reference_sql": "SELECT\n                p.product_id,\n                p.name,\n                ROUND(AVG(r.rating), 2) AS average_rating,\n                COUNT(*) AS review_count\n            FROM products AS p\n            JOIN reviews AS r ON r.product_id = p.product_id\n            GROUP BY p.product_id, p.name\n            HAVING AVG(r.rating) > 4 AND COUNT(*) >= 3\n            ORDER BY average_rating DESC, p.product_id\n            LIMIT 10",
+      "expected_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "expected_result": [
+        {
+          "product_id": 6,
+          "name": "Titan Plus 06",
+          "average_rating": 5.0,
+          "review_count": 3
+        },
+        {
+          "product_id": 34,
+          "name": "Zenith Max 34",
+          "average_rating": 5.0,
+          "review_count": 3
+        },
+        {
+          "product_id": 42,
+          "name": "Orbit X 42",
+          "average_rating": 5.0,
+          "review_count": 4
+        },
+        {
+          "product_id": 52,
+          "name": "Zenith Plus 52",
+          "average_rating": 5.0,
+          "review_count": 3
+        },
+        {
+          "product_id": 59,
+          "name": "Zenith Core 59",
+          "average_rating": 5.0,
+          "review_count": 3
+        },
+        {
+          "product_id": 68,
+          "name": "Zenith Air 68",
+          "average_rating": 5.0,
+          "review_count": 3
+        },
+        {
+          "product_id": 72,
+          "name": "Pulse X 72",
+          "average_rating": 5.0,
+          "review_count": 4
+        },
+        {
+          "product_id": 28,
+          "name": "Zenith Pro 28",
+          "average_rating": 4.67,
+          "review_count": 3
+        },
+        {
+          "product_id": 47,
+          "name": "Quantum X 47",
+          "average_rating": 4.67,
+          "review_count": 3
+        },
+        {
+          "product_id": 79,
+          "name": "Zenith X 79",
+          "average_rating": 4.67,
+          "review_count": 3
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q26",
+      "question": "How many orders contain at least three distinct product line items?",
+      "category": "aggregation",
+      "reference_sql": "SELECT COUNT(*) AS orders_with_three_or_more_items\n            FROM (\n                SELECT order_id\n                FROM order_items\n                GROUP BY order_id\n                HAVING COUNT(*) >= 3\n            )",
+      "expected_columns": [
+        "orders_with_three_or_more_items"
+      ],
+      "expected_result": [
+        {
+          "orders_with_three_or_more_items": 158
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q27",
+      "question": "How many payments are there for each status?",
+      "category": "aggregation",
+      "reference_sql": "SELECT status, COUNT(*) AS payment_count\n            FROM payments\n            GROUP BY status\n            ORDER BY status",
+      "expected_columns": [
+        "status",
+        "payment_count"
+      ],
+      "expected_result": [
+        {
+          "status": "failed",
+          "payment_count": 22
+        },
+        {
+          "status": "pending",
+          "payment_count": 19
+        },
+        {
+          "status": "refunded",
+          "payment_count": 13
+        },
+        {
+          "status": "successful",
+          "payment_count": 228
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q28",
+      "question": "How many shipments are there for each carrier?",
+      "category": "aggregation",
+      "reference_sql": "SELECT carrier, COUNT(*) AS shipment_count\n            FROM shipments\n            GROUP BY carrier\n            ORDER BY shipment_count DESC, carrier",
+      "expected_columns": [
+        "carrier",
+        "shipment_count"
+      ],
+      "expected_result": [
+        {
+          "carrier": "Meest",
+          "shipment_count": 90
+        },
+        {
+          "carrier": "Nova Post",
+          "shipment_count": 60
+        },
+        {
+          "carrier": "Ukrposhta",
+          "shipment_count": 57
+        }
+      ],
+      "order_sensitive": true
+    },
+    {
+      "id": "q29",
+      "question": "How many cancelled orders have no shipment record?",
+      "category": "joins",
+      "reference_sql": "SELECT COUNT(*) AS cancelled_without_shipment\n            FROM orders AS o\n            WHERE o.status = 'cancelled'\n              AND NOT EXISTS (\n                  SELECT 1\n                  FROM shipments AS s\n                  WHERE s.order_id = o.order_id\n              )",
+      "expected_columns": [
+        "cancelled_without_shipment"
+      ],
+      "expected_result": [
+        {
+          "cancelled_without_shipment": 29
+        }
+      ],
+      "order_sensitive": false
+    },
+    {
+      "id": "q30",
+      "question": "Show the 10 orders with the largest discounts, including order ID, status, and discount amount.",
+      "category": "sorting",
+      "reference_sql": "SELECT order_id, status, discount_cents\n            FROM orders\n            WHERE discount_cents > 0\n            ORDER BY discount_cents DESC, order_id\n            LIMIT 10",
+      "expected_columns": [
+        "order_id",
+        "status",
+        "discount_cents"
+      ],
+      "expected_result": [
+        {
+          "order_id": 190,
+          "status": "shipped",
+          "discount_cents": 302362
+        },
+        {
+          "order_id": 136,
+          "status": "processing",
+          "discount_cents": 172358
+        },
+        {
+          "order_id": 85,
+          "status": "shipped",
+          "discount_cents": 146266
+        },
+        {
+          "order_id": 100,
+          "status": "delivered",
+          "discount_cents": 139553
+        },
+        {
+          "order_id": 104,
+          "status": "delivered",
+          "discount_cents": 138833
+        },
+        {
+          "order_id": 17,
+          "status": "pending",
+          "discount_cents": 136153
+        },
+        {
+          "order_id": 210,
+          "status": "shipped",
+          "discount_cents": 135069
+        },
+        {
+          "order_id": 295,
+          "status": "delivered",
+          "discount_cents": 127644
+        },
+        {
+          "order_id": 200,
+          "status": "pending",
+          "discount_cents": 120732
+        },
+        {
+          "order_id": 164,
+          "status": "delivered",
+          "discount_cents": 116945
+        }
+      ],
+      "order_sensitive": true
+    }
+  ],
+  "data_edition": "english",
+  "database_sha256": "7196f7b5ca6fdc6958f0f09a486c34ba92424073285e069512cbd36dc189767a"
+}

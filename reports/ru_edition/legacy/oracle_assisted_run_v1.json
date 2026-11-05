@@ -1,0 +1,1122 @@
+{
+  "model": "qwen2.5:7b",
+  "max_correction_retries": 2,
+  "summary": {
+    "total": 30,
+    "passed": 14,
+    "failed": 16,
+    "success_rate_percent": 46.67
+  },
+  "results": [
+    {
+      "test_id": "q01",
+      "question": "Какие активные товары стоят меньше 500 гривен? Покажи первые 10.",
+      "initial_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "generated_sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0002,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие активные товары стоят меньше 500 гривен? Покажи первые 10.\n\nПредыдущий SQL:\nSELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие активные товары стоят меньше 500 гривен? Покажи первые 10.\n\nПредыдущий SQL:\nSELECT product_id, name, price_cents \nFROM products \nWHERE is_active = 1 AND price_cents < 50000 \nLIMIT 10\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q02",
+      "question": "Сколько покупателей живёт в каждом городе?",
+      "initial_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "generated_sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "city",
+        "customer_count"
+      ],
+      "actual_columns": [
+        "city",
+        "customer_count"
+      ],
+      "expected_row_count": 8,
+      "actual_row_count": 8,
+      "execution_time_seconds": 0.0002,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько покупателей живёт в каждом городе?\n\nПредыдущий SQL:\nSELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 8\nОжидаемое количество строк: 8\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько покупателей живёт в каждом городе?\n\nПредыдущий SQL:\nSELECT city, COUNT(*) AS customer_count \nFROM customers \nGROUP BY city;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 8\nОжидаемое количество строк: 8\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q03",
+      "question": "Сколько покупателей ещё не сделали ни одного заказа?",
+      "initial_sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "generated_sql": "SELECT COUNT(*) AS customers_without_orders \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "customers_without_orders"
+      ],
+      "actual_columns": [
+        "customers_without_orders"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 1,
+      "execution_time_seconds": 0.0002,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько покупателей ещё не сделали ни одного заказа?\n\nПредыдущий SQL:\nSELECT COUNT(*) \nFROM customers \nWHERE customer_id NOT IN (SELECT customer_id FROM orders)\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['customers_without_orders']\nПолученные названия столбцов: ['COUNT(*)']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['customers_without_orders'], получены ['COUNT(*)'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q04",
+      "question": "Сколько товаров ни разу не попадало ни в один заказ?",
+      "initial_sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "generated_sql": "SELECT COUNT(*) AS products_never_ordered \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "products_never_ordered"
+      ],
+      "actual_columns": [
+        "products_never_ordered"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 1,
+      "execution_time_seconds": 0.0002,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров ни разу не попадало ни в один заказ?\n\nПредыдущий SQL:\nSELECT COUNT(*) \nFROM products \nWHERE product_id NOT IN (SELECT product_id FROM order_items);\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['products_never_ordered']\nПолученные названия столбцов: ['COUNT(*)']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['products_never_ordered'], получены ['COUNT(*)'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q05",
+      "question": "Какие товары не продавались в доставленных заказах?",
+      "initial_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "generated_sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "product_id",
+        "name"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name"
+      ],
+      "expected_row_count": 3,
+      "actual_row_count": 0,
+      "execution_time_seconds": 0.0006,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие товары не продавались в доставленных заказах?\n\nПредыдущий SQL:\nSELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 0\nОжидаемое количество строк: 3\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие товары не продавались в доставленных заказах?\n\nПредыдущий SQL:\nSELECT p.product_id, p.name\nFROM products p\nLEFT JOIN order_items oi ON p.product_id = oi.product_id\nLEFT JOIN orders o ON oi.order_id = o.order_id\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE s.status = 'delivered' AND oi.order_id IS NULL;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 0\nОжидаемое количество строк: 3\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q06",
+      "question": "Покажи 10 самых дорогих товаров с названием и ценой.",
+      "initial_sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "generated_sql": "SELECT product_id, name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name",
+        "price_cents"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0018,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 самых дорогих товаров с названием и ценой.\n\nПредыдущий SQL:\nSELECT name, price_cents \nFROM products \nORDER BY price_cents DESC \nLIMIT 10\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'price_cents']\nПолученные названия столбцов: ['name', 'price_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'price_cents'], получены ['name', 'price_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q07",
+      "question": "Сколько заказов приходится на каждый статус?",
+      "initial_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "generated_sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "status",
+        "order_count"
+      ],
+      "actual_columns": [
+        "status",
+        "order_count"
+      ],
+      "expected_row_count": 6,
+      "actual_row_count": 6,
+      "execution_time_seconds": 0.0002,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов приходится на каждый статус?\n\nПредыдущий SQL:\nSELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 6\nОжидаемое количество строк: 6\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов приходится на каждый статус?\n\nПредыдущий SQL:\nSELECT status, COUNT(*) AS order_count\nFROM orders\nGROUP BY status\nORDER BY order_count DESC;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 6\nОжидаемое количество строк: 6\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q08",
+      "question": "Какова помесячная выручка от доставленных заказов с учётом скидок?",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "generated_sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+      "passed": false,
+      "error": null,
+      "columns_match": false,
+      "results_match": false,
+      "expected_columns": [
+        "month",
+        "revenue_cents"
+      ],
+      "actual_columns": [
+        "month",
+        "total_revenue_cents"
+      ],
+      "expected_row_count": 21,
+      "actual_row_count": 21,
+      "execution_time_seconds": 0.0023,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакова помесячная выручка от доставленных заказов с учётом скидок?\n\nПредыдущий SQL:\nWITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['month', 'revenue_cents']\nПолученные названия столбцов: ['month', 'total_revenue_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 21\nОжидаемое количество строк: 21\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['month', 'revenue_cents'], получены ['month', 'total_revenue_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакова помесячная выручка от доставленных заказов с учётом скидок?\n\nПредыдущий SQL:\nWITH delivered_orders AS (\n    SELECT \n        strftime('%Y-%m', o.ordered_at) AS month,\n        SUM(oi.quantity * oi.unit_price_cents - o.discount_cents) AS revenue_cents\n    FROM \n        orders o\n    JOIN \n        order_items oi ON o.order_id = oi.order_id\n    WHERE \n        o.status = 'delivered'\n    GROUP BY \n        month\n)\nSELECT \n    month,\n    SUM(revenue_cents) AS total_revenue_cents\nFROM \n    delivered_orders\nGROUP BY \n    month\nORDER BY \n    month\nLIMIT 100;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['month', 'revenue_cents']\nПолученные названия столбцов: ['month', 'total_revenue_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 21\nОжидаемое количество строк: 21\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['month', 'revenue_cents'], получены ['month', 'total_revenue_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Столбцы отличаются: ожидались ['month', 'revenue_cents'], получены ['month', 'total_revenue_cents'].",
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q09",
+      "question": "Какие категории имеют наибольшую стоимость проданных товаров в доставленных заказах до вычета скидок? Покажи все категории.",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+      "generated_sql": "SELECT \n    c.name AS category_name,\n    SUM(oi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS gross_sales_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    gross_sales_cents DESC;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "category_name",
+        "gross_sales_cents"
+      ],
+      "actual_columns": [
+        "category_name",
+        "gross_sales_cents"
+      ],
+      "expected_row_count": 8,
+      "actual_row_count": 8,
+      "execution_time_seconds": 0.0032,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;",
+          "passed": false,
+          "error": "no such column: pi.quantity",
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие категории имеют наибольшую стоимость проданных товаров в доставленных заказах до вычета скидок? Покажи все категории.\n\nПредыдущий SQL:\nSELECT \n    c.name AS category_name,\n    SUM(pi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC\nLIMIT 10;\n\nТип ошибки: выполнение SQL.\nСообщение SQLite: no such column: pi.quantity\nПроверь синтаксис, названия столбцов и связи таблиц.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT \n    c.name AS category_name,\n    SUM(oi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие категории имеют наибольшую стоимость проданных товаров в доставленных заказах до вычета скидок? Покажи все категории.\n\nПредыдущий SQL:\nSELECT \n    c.name AS category_name,\n    SUM(oi.quantity * (oi.unit_price_cents - o.discount_cents)) / 100 AS total_revenue_cents\nFROM \n    categories c\nJOIN \n    products p ON c.category_id = p.category_id\nJOIN \n    order_items oi ON p.product_id = oi.product_id\nJOIN \n    orders o ON oi.order_id = o.order_id\nJOIN \n    shipments s ON o.order_id = s.order_id\nWHERE \n    s.status = 'delivered'\nGROUP BY \n    c.name\nORDER BY \n    total_revenue_cents DESC;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['category_name', 'gross_sales_cents']\nПолученные названия столбцов: ['category_name', 'total_revenue_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 8\nОжидаемое количество строк: 8\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['category_name', 'gross_sales_cents'], получены ['category_name', 'total_revenue_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q10",
+      "question": "Покажи 10 товаров с наивысшим средним рейтингом, если у каждого есть не менее пяти отзывов.",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS avg_rating\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.avg_rating DESC\nLIMIT 10;",
+      "generated_sql": "WITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(review_id) AS review_count\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.average_rating,\n    ar.review_count\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.average_rating DESC\nLIMIT 10;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "expected_row_count": 6,
+      "actual_row_count": 6,
+      "execution_time_seconds": 0.0012,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS avg_rating\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.avg_rating DESC\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 товаров с наивысшим средним рейтингом, если у каждого есть не менее пяти отзывов.\n\nПредыдущий SQL:\nWITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS avg_rating\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.avg_rating\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.avg_rating DESC\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'average_rating', 'review_count']\nПолученные названия столбцов: ['product_id', 'name', 'avg_rating']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 6\nОжидаемое количество строк: 6\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'avg_rating'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(review_id) AS review_count\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.average_rating\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.average_rating DESC\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 товаров с наивысшим средним рейтингом, если у каждого есть не менее пяти отзывов.\n\nПредыдущий SQL:\nWITH avg_ratings AS (\n    SELECT \n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(review_id) AS review_count\n    FROM \n        reviews\n    GROUP BY \n        product_id\n    HAVING \n        COUNT(review_id) >= 5\n)\nSELECT \n    p.product_id,\n    p.name,\n    ar.average_rating\nFROM \n    products p\nJOIN \n    avg_ratings ar ON p.product_id = ar.product_id\nORDER BY \n    ar.average_rating DESC\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'average_rating', 'review_count']\nПолученные названия столбцов: ['product_id', 'name', 'average_rating']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 6\nОжидаемое количество строк: 6\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'average_rating'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q11",
+      "question": "Какие покупатели сделали больше трёх заказов? Покажи первых 10 по количеству заказов.",
+      "initial_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;",
+      "generated_sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;",
+      "passed": false,
+      "error": null,
+      "columns_match": false,
+      "results_match": false,
+      "expected_columns": [
+        "customer_id",
+        "full_name",
+        "order_count"
+      ],
+      "actual_columns": [
+        "customer_id",
+        "full_name",
+        "city",
+        "order_count"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0004,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие покупатели сделали больше трёх заказов? Покажи первых 10 по количеству заказов.\n\nПредыдущий SQL:\nSELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['customer_id', 'full_name', 'order_count']\nПолученные названия столбцов: ['customer_id', 'full_name', 'city', 'order_count']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['customer_id', 'full_name', 'order_count'], получены ['customer_id', 'full_name', 'city', 'order_count'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие покупатели сделали больше трёх заказов? Покажи первых 10 по количеству заказов.\n\nПредыдущий SQL:\nSELECT \n    c.customer_id, \n    c.full_name, \n    c.city, \n    COUNT(o.order_id) AS order_count\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.customer_id, \n    c.full_name, \n    c.city\nHAVING \n    COUNT(o.order_id) > 3\nORDER BY \n    order_count DESC, \n    c.customer_id\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['customer_id', 'full_name', 'order_count']\nПолученные названия столбцов: ['customer_id', 'full_name', 'city', 'order_count']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['customer_id', 'full_name', 'order_count'], получены ['customer_id', 'full_name', 'city', 'order_count'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Столбцы отличаются: ожидались ['customer_id', 'full_name', 'order_count'], получены ['customer_id', 'full_name', 'city', 'order_count'].",
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q12",
+      "question": "Покажи 10 самых дорогих заказов после применения скидки.",
+      "initial_sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+      "generated_sql": "SELECT \n    o.order_id,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cents\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id, o.status\nORDER BY \n    total_cents DESC\nLIMIT 10;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "order_id",
+        "status",
+        "total_cents"
+      ],
+      "actual_columns": [
+        "order_id",
+        "status",
+        "total_cents"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0018,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 самых дорогих заказов после применения скидки.\n\nПредыдущий SQL:\nSELECT \n    o.order_id,\n    o.ordered_at,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['order_id', 'status', 'total_cents']\nПолученные названия столбцов: ['order_id', 'ordered_at', 'status', 'total_cost_grivnas']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['order_id', 'status', 'total_cents'], получены ['order_id', 'ordered_at', 'status', 'total_cost_grivnas'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT \n    o.order_id,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 самых дорогих заказов после применения скидки.\n\nПредыдущий SQL:\nSELECT \n    o.order_id,\n    o.status,\n    SUM(i.quantity * (i.unit_price_cents - o.discount_cents)) / 100 AS total_cost_grivnas\nFROM \n    orders o\nJOIN \n    order_items i ON o.order_id = i.order_id\nGROUP BY \n    o.order_id\nORDER BY \n    total_cost_grivnas DESC\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['order_id', 'status', 'total_cents']\nПолученные названия столбцов: ['order_id', 'status', 'total_cost_grivnas']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['order_id', 'status', 'total_cents'], получены ['order_id', 'status', 'total_cost_grivnas'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q13",
+      "question": "Сколько заказов использовало каждый купон? Покажи также купоны без заказов.",
+      "initial_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+      "generated_sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS usage_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    COALESCE(cu.usage_count, 0) AS usage_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    usage_count DESC, c.code;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "coupon_id",
+        "code",
+        "usage_count"
+      ],
+      "actual_columns": [
+        "coupon_id",
+        "code",
+        "usage_count"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0014,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов использовало каждый купон? Покажи также купоны без заказов.\n\nПредыдущий SQL:\nWITH coupon_usage AS (\n    SELECT\n        coupon_id,\n        COUNT(order_id) AS order_count\n    FROM\n        orders\n    WHERE\n        coupon_id IS NOT NULL\n    GROUP BY\n        coupon_id\n)\nSELECT\n    c.coupon_id,\n    c.code,\n    cu.order_count\nFROM\n    coupons c\nLEFT JOIN\n    coupon_usage cu ON c.coupon_id = cu.coupon_id\nORDER BY\n    cu.order_count DESC, c.code;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['coupon_id', 'code', 'usage_count']\nПолученные названия столбцов: ['coupon_id', 'code', 'order_count']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['coupon_id', 'code', 'usage_count'], получены ['coupon_id', 'code', 'order_count'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q14",
+      "question": "Сколько заказов не имеют ни одной записи о платеже?",
+      "initial_sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "generated_sql": "SELECT COUNT(*) AS orders_without_payments \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "orders_without_payments"
+      ],
+      "actual_columns": [
+        "orders_without_payments"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 1,
+      "execution_time_seconds": 0.0015,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов не имеют ни одной записи о платеже?\n\nПредыдущий SQL:\nSELECT COUNT(*) \nFROM orders \nWHERE order_id NOT IN (SELECT order_id FROM payments);\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['orders_without_payments']\nПолученные названия столбцов: ['COUNT(*)']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['orders_without_payments'], получены ['COUNT(*)'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q15",
+      "question": "Какова сумма успешных платежей по месяцам?",
+      "initial_sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS payment_month,\n        SUM(amount_cents) AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n    GROUP BY \n        payment_month\n)\nSELECT \n    payment_month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    payment_month\nORDER BY \n    payment_month;",
+      "generated_sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS month,\n        amount_cents AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n)\nSELECT \n    month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    month\nORDER BY \n    month;",
+      "passed": false,
+      "error": null,
+      "columns_match": false,
+      "results_match": false,
+      "expected_columns": [
+        "month",
+        "successful_amount_cents"
+      ],
+      "actual_columns": [
+        "month",
+        "total_successful_amount_cents"
+      ],
+      "expected_row_count": 21,
+      "actual_row_count": 21,
+      "execution_time_seconds": 0.0022,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS payment_month,\n        SUM(amount_cents) AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n    GROUP BY \n        payment_month\n)\nSELECT \n    payment_month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    payment_month\nORDER BY \n    payment_month;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакова сумма успешных платежей по месяцам?\n\nПредыдущий SQL:\nWITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS payment_month,\n        SUM(amount_cents) AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n    GROUP BY \n        payment_month\n)\nSELECT \n    payment_month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    payment_month\nORDER BY \n    payment_month;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['month', 'successful_amount_cents']\nПолученные названия столбцов: ['payment_month', 'total_successful_amount_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 21\nОжидаемое количество строк: 21\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['month', 'successful_amount_cents'], получены ['payment_month', 'total_successful_amount_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS month,\n        amount_cents AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n)\nSELECT \n    month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    month\nORDER BY \n    month;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакова сумма успешных платежей по месяцам?\n\nПредыдущий SQL:\nWITH successful_payments AS (\n    SELECT \n        strftime('%Y-%m', paid_at) AS month,\n        amount_cents AS successful_amount_cents\n    FROM \n        payments\n    WHERE \n        status = 'successful'\n)\nSELECT \n    month,\n    SUM(successful_amount_cents) AS total_successful_amount_cents\nFROM \n    successful_payments\nGROUP BY \n    month\nORDER BY \n    month;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['month', 'successful_amount_cents']\nПолученные названия столбцов: ['month', 'total_successful_amount_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 21\nОжидаемое количество строк: 21\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['month', 'successful_amount_cents'], получены ['month', 'total_successful_amount_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Столбцы отличаются: ожидались ['month', 'successful_amount_cents'], получены ['month', 'total_successful_amount_cents'].",
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q16",
+      "question": "Сколько товаров поставляет каждый поставщик, включая поставщиков без товаров?",
+      "initial_sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "generated_sql": "SELECT \n    s.supplier_id, \n    s.name AS supplier_name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "supplier_id",
+        "supplier_name",
+        "product_count"
+      ],
+      "actual_columns": [
+        "supplier_id",
+        "supplier_name",
+        "product_count"
+      ],
+      "expected_row_count": 12,
+      "actual_row_count": 12,
+      "execution_time_seconds": 0.0003,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров поставляет каждый поставщик, включая поставщиков без товаров?\n\nПредыдущий SQL:\nSELECT \n    s.supplier_id, \n    s.name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['supplier_id', 'supplier_name', 'product_count']\nПолученные названия столбцов: ['supplier_id', 'name', 'product_count']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 12\nОжидаемое количество строк: 12\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['supplier_id', 'supplier_name', 'product_count'], получены ['supplier_id', 'name', 'product_count'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT \n    s.supplier_id, \n    s.name AS supplier_name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров поставляет каждый поставщик, включая поставщиков без товаров?\n\nПредыдущий SQL:\nSELECT \n    s.supplier_id, \n    s.name AS supplier_name, \n    COUNT(p.product_id) AS product_count\nFROM \n    suppliers s\nLEFT JOIN \n    products p ON s.supplier_id = p.supplier_id\nGROUP BY \n    s.supplier_id, \n    s.name\nORDER BY \n    product_count DESC, \n    s.name ASC;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 12\nОжидаемое количество строк: 12\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q17",
+      "question": "Сколько товаров сейчас имеют нулевой остаток на складе?",
+      "initial_sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+      "generated_sql": "SELECT COUNT(*) AS out_of_stock_count\nFROM products\nWHERE stock_quantity = 0;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "out_of_stock_count"
+      ],
+      "actual_columns": [
+        "out_of_stock_count"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 1,
+      "execution_time_seconds": 0.0009,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров сейчас имеют нулевой остаток на складе?\n\nПредыдущий SQL:\nSELECT COUNT(*) AS zero_stock_products\nFROM products\nWHERE stock_quantity = 0;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['out_of_stock_count']\nПолученные названия столбцов: ['zero_stock_products']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['out_of_stock_count'], получены ['zero_stock_products'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q18",
+      "question": "Сколько отзывов получено для каждой оценки от 1 до 5?",
+      "initial_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "generated_sql": "SELECT rating, COUNT(*) AS review_count\nFROM reviews\nGROUP BY rating\nORDER BY rating;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "rating",
+        "review_count"
+      ],
+      "actual_columns": [
+        "rating",
+        "review_count"
+      ],
+      "expected_row_count": 5,
+      "actual_row_count": 5,
+      "execution_time_seconds": 0.0003,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    },
+    {
+      "test_id": "q19",
+      "question": "Покажи 10 последних зарегистрированных покупателей.",
+      "initial_sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10;",
+      "generated_sql": "SELECT customer_id, full_name, city, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "customer_id",
+        "full_name",
+        "city",
+        "registered_at"
+      ],
+      "actual_columns": [
+        "customer_id",
+        "full_name",
+        "city",
+        "registered_at"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0003,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 последних зарегистрированных покупателей.\n\nПредыдущий SQL:\nSELECT full_name, email, registered_at\nFROM customers\nORDER BY registered_at DESC\nLIMIT 10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['customer_id', 'full_name', 'city', 'registered_at']\nПолученные названия столбцов: ['full_name', 'email', 'registered_at']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['customer_id', 'full_name', 'city', 'registered_at'], получены ['full_name', 'email', 'registered_at'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q20",
+      "question": "Сколько товаров находится в каждой категории?",
+      "initial_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "generated_sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "category_name",
+        "product_count"
+      ],
+      "actual_columns": [
+        "category_name",
+        "product_count"
+      ],
+      "expected_row_count": 8,
+      "actual_row_count": 8,
+      "execution_time_seconds": 0.0009,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров находится в каждой категории?\n\nПредыдущий SQL:\nSELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 8\nОжидаемое количество строк: 8\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько товаров находится в каждой категории?\n\nПредыдущий SQL:\nSELECT \n    c.name AS category_name,\n    COUNT(p.product_id) AS product_count\nFROM \n    products p\nJOIN \n    categories c ON p.category_id = c.category_id\nGROUP BY \n    c.name\nORDER BY \n    product_count DESC, c.name ASC;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 8\nОжидаемое количество строк: 8\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q21",
+      "question": "Какие пять товаров купили в наибольшем количестве единиц в доставленных заказах?",
+      "initial_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.name, SUM(oi.quantity) AS total_quantity\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id\nORDER BY total_quantity DESC\nLIMIT 5;",
+      "generated_sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS units_sold\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY units_sold DESC\nLIMIT 5;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "product_id",
+        "name",
+        "units_sold"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name",
+        "units_sold"
+      ],
+      "expected_row_count": 5,
+      "actual_row_count": 5,
+      "execution_time_seconds": 0.0008,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.name, SUM(oi.quantity) AS total_quantity\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id\nORDER BY total_quantity DESC\nLIMIT 5;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие пять товаров купили в наибольшем количестве единиц в доставленных заказах?\n\nПредыдущий SQL:\nWITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.name, SUM(oi.quantity) AS total_quantity\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id\nORDER BY total_quantity DESC\nLIMIT 5;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'units_sold']\nПолученные названия столбцов: ['name', 'total_quantity']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 5\nОжидаемое количество строк: 5\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'units_sold'], получены ['name', 'total_quantity'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS units_sold\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY units_sold DESC\nLIMIT 5;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие пять товаров купили в наибольшем количестве единиц в доставленных заказах?\n\nПредыдущий SQL:\nWITH delivered_orders AS (\n    SELECT order_id\n    FROM shipments\n    WHERE status = 'delivered'\n)\nSELECT p.product_id, p.name, SUM(oi.quantity) AS units_sold\nFROM products p\nJOIN order_items oi ON p.product_id = oi.product_id\nJOIN delivered_orders do ON oi.order_id = do.order_id\nGROUP BY p.product_id, p.name\nORDER BY units_sold DESC\nLIMIT 5;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 5\nОжидаемое количество строк: 5\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q22",
+      "question": "Покажи 10 последних заказов, в которых применялся купон.",
+      "initial_sql": "SELECT o.order_id, o.ordered_at, o.status, c.full_name, co.code\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10",
+      "generated_sql": "SELECT o.order_id, o.ordered_at, co.code AS coupon_code\nFROM orders o\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10",
+      "passed": false,
+      "error": null,
+      "columns_match": false,
+      "results_match": false,
+      "expected_columns": [
+        "order_id",
+        "ordered_at",
+        "coupon_code",
+        "discount_cents"
+      ],
+      "actual_columns": [
+        "order_id",
+        "ordered_at",
+        "coupon_code"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0011,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT o.order_id, o.ordered_at, o.status, c.full_name, co.code\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 последних заказов, в которых применялся купон.\n\nПредыдущий SQL:\nSELECT o.order_id, o.ordered_at, o.status, c.full_name, co.code\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['order_id', 'ordered_at', 'coupon_code', 'discount_cents']\nПолученные названия столбцов: ['order_id', 'ordered_at', 'status', 'full_name', 'code']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['order_id', 'ordered_at', 'coupon_code', 'discount_cents'], получены ['order_id', 'ordered_at', 'status', 'full_name', 'code'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT o.order_id, o.ordered_at, co.code AS coupon_code, co.discount_cents\nFROM orders o\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10",
+          "passed": false,
+          "error": "no such column: co.discount_cents",
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nПокажи 10 последних заказов, в которых применялся купон.\n\nПредыдущий SQL:\nSELECT o.order_id, o.ordered_at, co.code AS coupon_code, co.discount_cents\nFROM orders o\nLEFT JOIN coupons co ON o.coupon_id = co.coupon_id\nWHERE o.coupon_id IS NOT NULL\nORDER BY o.ordered_at DESC\nLIMIT 10\n\nТип ошибки: выполнение SQL.\nСообщение SQLite: no such column: co.discount_cents\nПроверь синтаксис, названия столбцов и связи таблиц.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Столбцы отличаются: ожидались ['order_id', 'ordered_at', 'coupon_code', 'discount_cents'], получены ['order_id', 'ordered_at', 'coupon_code'].",
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q23",
+      "question": "Сколько заказов каждого статуса было оформлено в 2026 году?",
+      "initial_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "generated_sql": "SELECT \n    status, \n    COUNT(*) AS order_count\nFROM \n    orders\nWHERE \n    ordered_at LIKE '2026-%'\nGROUP BY \n    status;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "status",
+        "order_count"
+      ],
+      "actual_columns": [
+        "status",
+        "order_count"
+      ],
+      "expected_row_count": 6,
+      "actual_row_count": 6,
+      "execution_time_seconds": 0.0016,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    },
+    {
+      "test_id": "q24",
+      "question": "Сколько покупателей зарегистрировалось в каждом году?",
+      "initial_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "generated_sql": "SELECT \n    strftime('%Y', registered_at) AS registration_year,\n    COUNT(*) AS customer_count\nFROM \n    customers\nGROUP BY \n    registration_year\nORDER BY \n    registration_year\nLIMIT 100;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "registration_year",
+        "customer_count"
+      ],
+      "actual_columns": [
+        "registration_year",
+        "customer_count"
+      ],
+      "expected_row_count": 2,
+      "actual_row_count": 2,
+      "execution_time_seconds": 0.0002,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    },
+    {
+      "test_id": "q25",
+      "question": "Какие товары имеют средний рейтинг выше 4 и не менее трёх отзывов? Покажи первые 10.",
+      "initial_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    p.category_id,\n    p.supplier_id,\n    p.price_cents\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC, p.name\nLIMIT\n    10;",
+      "generated_sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    ar.average_rating,\n    ar.review_count\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.average_rating DESC, p.name\nLIMIT\n    10;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "actual_columns": [
+        "product_id",
+        "name",
+        "average_rating",
+        "review_count"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0004,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    p.category_id,\n    p.supplier_id,\n    p.price_cents\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC, p.name\nLIMIT\n    10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие товары имеют средний рейтинг выше 4 и не менее трёх отзывов? Покажи первые 10.\n\nПредыдущий SQL:\nWITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS avg_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    p.category_id,\n    p.supplier_id,\n    p.price_cents\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.avg_rating DESC, p.name\nLIMIT\n    10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'average_rating', 'review_count']\nПолученные названия столбцов: ['product_id', 'name', 'category_id', 'supplier_id', 'price_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'category_id', 'supplier_id', 'price_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "WITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    p.category_id,\n    p.supplier_id,\n    p.price_cents\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.average_rating DESC, p.name\nLIMIT\n    10;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nКакие товары имеют средний рейтинг выше 4 и не менее трёх отзывов? Покажи первые 10.\n\nПредыдущий SQL:\nWITH avg_ratings AS (\n    SELECT\n        product_id,\n        AVG(rating) AS average_rating,\n        COUNT(*) AS review_count\n    FROM\n        reviews\n    GROUP BY\n        product_id\n    HAVING\n        AVG(rating) > 4 AND COUNT(*) >= 3\n)\nSELECT\n    p.product_id,\n    p.name,\n    p.category_id,\n    p.supplier_id,\n    p.price_cents\nFROM\n    products p\nJOIN\n    avg_ratings ar\nON\n    p.product_id = ar.product_id\nORDER BY\n    ar.average_rating DESC, p.name\nLIMIT\n    10;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['product_id', 'name', 'average_rating', 'review_count']\nПолученные названия столбцов: ['product_id', 'name', 'category_id', 'supplier_id', 'price_cents']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 10\nОжидаемое количество строк: 10\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['product_id', 'name', 'average_rating', 'review_count'], получены ['product_id', 'name', 'category_id', 'supplier_id', 'price_cents'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q26",
+      "question": "Сколько заказов содержат не менее трёх разных товарных позиций?",
+      "initial_sql": "SELECT COUNT(DISTINCT order_id) \nFROM order_items \nGROUP BY order_id \nHAVING COUNT(DISTINCT product_id) >= 3",
+      "generated_sql": "SELECT COUNT(DISTINCT order_id) AS orders_with_three_or_more_items\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3;",
+      "passed": false,
+      "error": null,
+      "columns_match": true,
+      "results_match": false,
+      "expected_columns": [
+        "orders_with_three_or_more_items"
+      ],
+      "actual_columns": [
+        "orders_with_three_or_more_items"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 158,
+      "execution_time_seconds": 0.003,
+      "attempts": 3,
+      "correction_retries": 2,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(DISTINCT order_id) \nFROM order_items \nGROUP BY order_id \nHAVING COUNT(DISTINCT product_id) >= 3",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов содержат не менее трёх разных товарных позиций?\n\nПредыдущий SQL:\nSELECT COUNT(DISTINCT order_id) \nFROM order_items \nGROUP BY order_id \nHAVING COUNT(DISTINCT product_id) >= 3\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['orders_with_three_or_more_items']\nПолученные названия столбцов: ['COUNT(DISTINCT order_id)']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 158\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['orders_with_three_or_more_items'], получены ['COUNT(DISTINCT order_id)'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        },
+        {
+          "attempt": 2,
+          "sql": "SELECT COUNT(DISTINCT order_id) AS orders_with_three_or_more_items\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3\nLIMIT 1;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько заказов содержат не менее трёх разных товарных позиций?\n\nПредыдущий SQL:\nSELECT COUNT(DISTINCT order_id) AS orders_with_three_or_more_items\nFROM order_items\nGROUP BY order_id\nHAVING COUNT(DISTINCT product_id) >= 3\nLIMIT 1;\n\nТип ошибки: результат не прошёл проверку.\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": [
+        "Результаты отличаются от эталона."
+      ]
+    },
+    {
+      "test_id": "q27",
+      "question": "Сколько платежей имеет каждый статус?",
+      "initial_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "generated_sql": "SELECT status, COUNT(*) AS payment_count\nFROM payments\nGROUP BY status;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "status",
+        "payment_count"
+      ],
+      "actual_columns": [
+        "status",
+        "payment_count"
+      ],
+      "expected_row_count": 4,
+      "actual_row_count": 4,
+      "execution_time_seconds": 0.0013,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    },
+    {
+      "test_id": "q28",
+      "question": "Сколько отправлений приходится на каждого перевозчика?",
+      "initial_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "generated_sql": "WITH shipment_counts AS (\n    SELECT \n        carrier,\n        COUNT(*) AS shipment_count\n    FROM \n        shipments\n    GROUP BY \n        carrier\n)\nSELECT \n    carrier,\n    shipment_count\nFROM \n    shipment_counts\nORDER BY \n    shipment_count DESC, \n    carrier\nLIMIT 10;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "carrier",
+        "shipment_count"
+      ],
+      "actual_columns": [
+        "carrier",
+        "shipment_count"
+      ],
+      "expected_row_count": 3,
+      "actual_row_count": 3,
+      "execution_time_seconds": 0.0014,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    },
+    {
+      "test_id": "q29",
+      "question": "Сколько отменённых заказов не имеют записи о доставке?",
+      "initial_sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "generated_sql": "SELECT COUNT(o.order_id) AS cancelled_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "cancelled_without_shipment"
+      ],
+      "actual_columns": [
+        "cancelled_without_shipment"
+      ],
+      "expected_row_count": 1,
+      "actual_row_count": 1,
+      "execution_time_seconds": 0.0003,
+      "attempts": 2,
+      "correction_retries": 1,
+      "correction_history": [
+        {
+          "attempt": 1,
+          "sql": "SELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;",
+          "passed": false,
+          "error": null,
+          "feedback": "Предыдущий SQL-запрос не прошёл проверку.\nИсправь запрос, сохранив смысл исходного вопроса.\n\nИсходный вопрос:\nСколько отменённых заказов не имеют записи о доставке?\n\nПредыдущий SQL:\nSELECT COUNT(o.order_id) AS cancelled_orders_without_shipment\nFROM orders o\nLEFT JOIN shipments s ON o.order_id = s.order_id\nWHERE o.status = 'cancelled' AND s.shipment_id IS NULL;\n\nТип ошибки: результат не прошёл проверку.\nНазвания или порядок столбцов не совпадают.\nОжидаемые названия столбцов:\n['cancelled_without_shipment']\nПолученные названия столбцов: ['cancelled_orders_without_shipment']\nВозвращённые данные не совпали с проверкой.\nКоличество строк в результате: 1\nОжидаемое количество строк: 1\nПроверь фильтрацию, JOIN, агрегации, GROUP BY, HAVING, сортировку и LIMIT.\nДиагностика:\n- Столбцы отличаются: ожидались ['cancelled_without_shipment'], получены ['cancelled_orders_without_shipment'].\n- Результаты отличаются от эталона.\n\nНе используй несуществующие таблицы или столбцы.\nСохрани смысл исходного вопроса.\nВерни только один исправленный SQL-запрос для SQLite.\nНе добавляй пояснения или Markdown."
+        }
+      ],
+      "details": []
+    },
+    {
+      "test_id": "q30",
+      "question": "Покажи 10 заказов с наибольшей скидкой, включая номер, статус и размер скидки.",
+      "initial_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "generated_sql": "SELECT order_id, status, discount_cents\nFROM orders\nORDER BY discount_cents DESC\nLIMIT 10;",
+      "passed": true,
+      "error": null,
+      "columns_match": true,
+      "results_match": true,
+      "expected_columns": [
+        "order_id",
+        "status",
+        "discount_cents"
+      ],
+      "actual_columns": [
+        "order_id",
+        "status",
+        "discount_cents"
+      ],
+      "expected_row_count": 10,
+      "actual_row_count": 10,
+      "execution_time_seconds": 0.0004,
+      "attempts": 1,
+      "correction_retries": 0,
+      "correction_history": [],
+      "details": []
+    }
+  ]
+}

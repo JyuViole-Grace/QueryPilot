@@ -1,0 +1,8 @@
+.git
+.pytest_cache
+.tmp
+__pycache__
+*.pyc
+reports/
+logs/
+database/querypilot.db
