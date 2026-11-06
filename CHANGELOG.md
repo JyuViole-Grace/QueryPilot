@@ -53,7 +53,7 @@ First public release.
 ### Known limitations
 - Scores come from one synthetic database and small samples; `heldout_v4`
   was written by an AI assistant after the development failures were known.
-- The `heldout_v4` result was measured before the critic was removed. After
-  removal `heldout_v3` gave EX 18/30 in two runs (same as before); `heldout_v4`
-  was deliberately not re-run.
+- The 86% on the Russian-language edition was measured with the critic in the
+  loop; the 83% on the English edition was measured after its removal.
+  `heldout_v3` gave EX 18/30 in two runs both before and after the removal.
 - The HTTP API has no authentication and is meant for localhost use.

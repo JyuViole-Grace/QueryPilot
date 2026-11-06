@@ -22,9 +22,9 @@ reporting.
 > numbers, different text, difference within noise). The set was written
 > by an AI assistant with explicit, unambiguous wording, so this is a measure
 > on tidy questions, not general Text-to-SQL accuracy. On the messier
-> 30-question development set `heldout_v3` the same model scores about 60-63%
-> (n = 30, CI roughly 42-78%). A 14B model gave no measurable gain on
-> `heldout_v3`. See [Benchmark status](docs/EVALUATION.md#benchmark-status).
+> 30-question development set `heldout_v3` the same model scores 57%
+> (17/30, CI 39-73%) on the English data. A 14B model gave no measurable
+> gain on `heldout_v3` (measured on the Russian edition). See [Benchmark status](docs/EVALUATION.md#benchmark-status).
 
 Documentation: [evaluation and experiments](docs/EVALUATION.md) |
 [changelog](CHANGELOG.md)
@@ -146,34 +146,18 @@ be presented as an independent evaluation.
 QueryPilot uses a reproducible synthetic e-commerce database with 10
 tables:
 
-  -----------------------------------------------------------------------
-  Table                               Purpose
-  ----------------------------------- -----------------------------------
-  `customers`                         Customer records and registration
-                                      details
-
-  `categories`                        Product categories
-
-  `suppliers`                         Product suppliers
-
-  `products`                          Product catalog, prices, stock, and
-                                      supplier/category relations
-
-  `coupons`                           Discount coupon definitions
-
-  `orders`                            Customer orders, dates, statuses,
-                                      and discounts
-
-  `order_items`                       Products and quantities within
-                                      orders
-
-  `payments`                          Payment records and statuses
-
-  `shipments`                         Shipment records and carriers
-
-  `reviews`                           Customer product reviews and
-                                      ratings
-  -----------------------------------------------------------------------
+| Table | Purpose |
+| ----- | ------- |
+| `customers` | Customer records and registration details |
+| `categories` | Product categories |
+| `suppliers` | Product suppliers |
+| `products` | Product catalog, prices, stock, and supplier/category relations |
+| `coupons` | Discount coupon definitions |
+| `orders` | Customer orders, dates, statuses, and discounts |
+| `order_items` | Products and quantities within orders |
+| `payments` | Payment records and statuses |
+| `shipments` | Shipment records and carriers |
+| `reviews` | Customer product reviews and ratings |
 
 The database is initialized from `sql/schema.sql` and populated by
 `scripts/seed_data.py` (fixed random seed, so the database is exactly
@@ -193,7 +177,7 @@ records.
 ### 1. Clone the repository and create an environment
 
 ``` bash
-git clone <repository-url>
+git clone https://github.com/JyuViole-Grace/QueryPilot.git
 cd QueryPilot
 
 python -m venv .venv
@@ -326,9 +310,10 @@ What the experiments showed:
 -   **An LLM critic did not work and was removed:** it missed all 12 wrong
     answers that executed on `heldout_v4` and flagged one correct answer
     (see [docs/EVALUATION.md](docs/EVALUATION.md#the-semantic-critic-evaluated-and-removed-5-nov-2026)).
-    The `heldout_v4` number was measured while it was still in the loop (its
-    only observed effect was a few wasted calls); after removal `heldout_v3`
-    was re-run twice and gave the same EX (18/30).
+    The 86% on the Russian edition was measured with it in the loop (its only
+    observed effect was a few wasted calls); the 83% on the English edition
+    was measured after its removal, and `heldout_v3` gave the same EX (18/30)
+    in two runs before and after.
 -   **Resampling a repeated answer did not help** (Russian edition) and is
     off by default.
 -   **Self-correction adds little** (+2 of 100 on the Russian edition, 0 on
@@ -407,7 +392,7 @@ reports/
   en_*.json                   Runs on the current English data (after re-measurement)
 ```
 
-The SQLite database is kept in the archive because the dataset fingerprints
+The SQLite database is kept in the repository because the dataset fingerprints
 refer to this snapshot; a test checks that a fresh run of `seed_data.py`
 reproduces it exactly. It is listed in `.dockerignore` and regenerated inside
 the Docker image by the seed script.
@@ -430,9 +415,9 @@ the Docker image by the seed script.
 -   Quality validation is heuristic and cannot prove that a query
     captures every semantic detail of a natural-language question.
 -   A query can execute successfully and still return the wrong answer.
--   The current held-out v3 set contains only 30 questions; confidence
-    intervals are wide and the sample does not establish broad
-    real-world accuracy.
+-   The development set `heldout_v3` has 30 questions and the clean set
+    `heldout_v4` 100; confidence intervals are still wide and neither
+    establishes broad real-world accuracy.
 -   Results are specific to the model, prompt, database snapshot,
     dataset version, and repair configuration recorded in the report.
 -   Local inference avoids sending prompts to a hosted LLM API in the
@@ -457,7 +442,7 @@ Ordered by what the evaluation points to:
     the development failures were known).
 -   Reduce benchmark-specific wording in the prompt and move domain rules
     into schema documentation.
--   Add UI screenshots or a short demo recording of a complete query cycle.
+-   Add a short demo recording (GIF) of a complete query cycle.
 -   Evaluate self-consistency voting (several candidates, keep the most
     frequent result); not implemented.
 -   Add broader runtime and security testing.
@@ -469,6 +454,7 @@ MIT. See [LICENSE](LICENSE).
 ## Project language
 
 The application UI, CLI output, prompts, documentation, source comments,
-and benchmark questions are in English. Some synthetic database values,
-such as customer names, cities, category names, and country names, may
-be localized because they are part of the generated test data.
+benchmark questions and sample data are in English (Ukrainian city names and
+transliterated customer names). An earlier development phase used
+Russian-language values for those four text columns; see
+[docs/EVALUATION.md](docs/EVALUATION.md#data-editions).

@@ -121,36 +121,26 @@ same SQL), so they are one sample, not two. Against the earlier run with the
 critic (`v3_hints_on_a.json`, EX 18/30) the first SQL differs on 12 of 30
 questions and three questions change outcome (v3_05 worse, v3_28 better,
 v3_30 now ends in an execution error), consistent with the run-to-run
-nondeterminism described below. The `heldout_v4` result (86%) was not
-re-measured.
+nondeterminism described below. The English-edition run of `heldout_v4` (83%, see above) was made after the critic had been removed.
 
 ## Datasets and results
+
+> Unless stated otherwise, the figures in this part were measured on the
+> Russian-language edition of the sample data (see [Data editions](#data-editions)).
 
 QueryPilot separates development validation from held-out model
 evaluation.
 
 ### Datasets
 
-  -----------------------------------------------------------------------------
-  Dataset                       Role                    Usage
-  ----------------------------- ----------------------- -----------------------
-  `golden_questions.json`       Development             Reference SQL checks
-                                                        and iterative
-                                                        development
+| Dataset | Role | Usage |
+| ------- | ---- | ----- |
+| `golden_questions.json` | Development | Reference SQL checks and iterative development |
+| `heldout_questions.json` | Historical, contaminated | Earlier experiments; not suitable as a fresh independent benchmark |
+| `heldout_v3_questions.json` | Development (was held-out on its first run) | 30 questions; used for critic and grounding development after 31 Oct 2026 |
+| `heldout_v4_questions.json` | Held-out | 100 validated questions (see "Experiment plan"); one clean run on the Russian edition, re-measured on the English edition |
 
-  `heldout_questions.json`      Historical /            Earlier experiments;
-                                contaminated            not suitable as a fresh
-                                                        independent headline
-                                                        benchmark
-
-  `heldout_v3_questions.json`   Development (was       30-question set; used
-                                held-out on first run)  for critic development
-                                                        after 31 Oct 2026
-  `heldout_v4_questions.json`   Clean held-out,         100 validated questions
-                                run once                (see "Experiment plan")
-  -----------------------------------------------------------------------------
-
-The current held-out v3 dataset contains **30 English questions** and is
+The `heldout_v3` development dataset contains **30 English questions** and is
 tied to a specific SQLite database snapshot through its recorded
 database fingerprint. Its reference SQL was validated separately before
 model evaluation.
@@ -390,7 +380,7 @@ How to read this:
 -   The repair stage added 2 questions (84 to 86), the same order of
     magnitude as run-to-run noise.
 -   The semantic critic did not catch any of the 12 wrong answers that
-    executed (see the audit below).
+    executed (see the audit above).
 -   Nothing was tuned on `heldout_v4`. Under the protocol the set is now
     used: do not change the prompt, grounding, validators or repair in
     response to its failures. Audit it for defects (a wrong reference or an
@@ -410,12 +400,12 @@ Run configuration:
     evaluation flow
 -   **Intermediate checkpointing:** enabled
 
-  Metric                                      First attempt   After quality repair
-  --------------------------------------- ----------------- ----------------------
-  Strict Match (column names and order)           2/30 (7%)              2/30 (7%)
-  Execution Match (EX)                      **13/30 (43%)**        **14/30 (47%)**
-  Lenient Match                                 15/30 (50%)            16/30 (53%)
-  SQL executed without errors                   25/30 (83%)            28/30 (93%)
+| Metric | First attempt | After quality repair |
+| ------ | ------------- | -------------------- |
+| Strict Match (column names and order) | 2/30 (7%) | 2/30 (7%) |
+| Execution Match (EX) | **13/30 (43%)** | **14/30 (47%)** |
+| Lenient Match | 15/30 (50%) | 16/30 (53%) |
+| SQL executed without errors | 25/30 (83%) | 28/30 (93%) |
 
 Additional observations from this run:
 
@@ -439,15 +429,15 @@ difficult areas for the current model and grounding strategy.
 
 Execution Match by category, first attempt → after repair:
 
-  Category                    First attempt   After repair
-  ------------------------- --------------- --------------
-  Aggregation                           4/6            4/6
-  Date aggregation                      2/2            2/2
-  Filtering                             1/1            1/1
-  Joins                                 1/5            1/5
-  Multi-table aggregation               0/9            1/9
-  Sorting                               0/1            0/1
-  Subqueries                            5/6            5/6
+| Category | First attempt | After repair |
+| -------- | ------------- | ------------ |
+| Aggregation | 4/6 | 4/6 |
+| Date aggregation | 2/2 | 2/2 |
+| Filtering | 1/1 | 1/1 |
+| Joins | 1/5 | 1/5 |
+| Multi-table aggregation | 0/9 | 1/9 |
+| Sorting | 0/1 | 0/1 |
+| Subqueries | 5/6 | 5/6 |
 
 The category counts are descriptive only. Several categories contain
 very few questions, so they should not be interpreted as stable
