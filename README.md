@@ -1,5 +1,7 @@
 # QueryPilot
 
+[![CI](https://github.com/JyuViole-Grace/QueryPilot/actions/workflows/ci.yml/badge.svg)](https://github.com/JyuViole-Grace/QueryPilot/actions/workflows/ci.yml)
+
 **A local-first Text-to-SQL AI agent for SQLite, built around schema
 grounding, guarded execution, validation, and bounded self-correction.**
 
